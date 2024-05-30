@@ -17,7 +17,7 @@ def _tangle_problem_bqm(graph: nx.Graph, lamda: list, mu: float, P: int) -> Bina
         graph (nx.Graph): the node-weighted graph which underlies the tangle problem
     """
     bqm = BinaryQuadraticModel({}, {}, 0, "BINARY")
-    t_max = sum(graph.nodes.data()[i]["weight"] for i in range(len(graph.nodes))) + 1
+    t_max = sum(graph.nodes.data()[node]["weight"] for node in graph.nodes) + 1
     
     qubo_graph = setup_graph_for_qubo(graph, t_max)
     nodes = list(qubo_graph.nodes)
@@ -27,9 +27,9 @@ def _tangle_problem_bqm(graph: nx.Graph, lamda: list, mu: float, P: int) -> Bina
     for t in range(t_max - 1):
         for i, j in product(range(len(nodes)), range(len(nodes))):
             bqm.add_interaction(
-                (i, t), 
-                (j, t + 1), 
-                -1 if ((i, j) in edges) else P
+                (nodes[i], t), 
+                (nodes[j], t + 1), 
+                -1 if ((nodes[i], nodes[j]) in edges) else P
             )
                 
         # Travelling the virtual edges should not be rewarded
@@ -45,23 +45,24 @@ def _tangle_problem_bqm(graph: nx.Graph, lamda: list, mu: float, P: int) -> Bina
     for t in range(t_max):
         bqm.offset += P
         for i in range(len(nodes)): 
-            bqm.add_linear((i, t), -P)
+            bqm.add_linear((nodes[i], t), -P)
             for j in range(i):
-                bqm.add_interaction((i, t), (j, t), 2 * P) 
+                bqm.add_interaction((nodes[i], t), (nodes[j], t), 2 * P) 
                 
     # Generalised Lagrangian Penalties
     for i in range(len(nodes) - 1):
-        weight = qubo_graph.nodes.data()[i]["weight"]
+        weight = qubo_graph.nodes.data()[nodes[i]]["weight"]
         bqm.offset += mu / 2 * weight ** 2 - lamda[i] * weight
         for t1 in range(t_max):
-            bqm.add_linear((i, t1), mu / 2 * (1 - 2 * weight) + lamda[i])
+            bqm.add_linear((nodes[i], t1), mu / 2 * (1 - 2 * weight) + lamda[i])
             for t2 in range(t1):
-                bqm.add_interaction((i, t2), (i, t1), mu)
+                bqm.add_interaction((nodes[i], t2), (nodes[i], t1), mu)
     
     return bqm
     
-    
-def _sample_bqm(sampler: Sampler, bqm: BinaryQuadraticModel, num_reads=30):
+
+# TODO: increase num_reads
+def _sample_bqm(sampler: Sampler, bqm: BinaryQuadraticModel, num_reads=1):
     """Perform a batch of annealing on a given Binary Quadratic Model.
 
     Args:
@@ -125,13 +126,13 @@ def tangle_problem(graph: nx.DiGraph, sampler=None, lamda=None, mu=0.5, growth_f
     if growth_factor <= 1:
         raise Exception("Growth factor should be strictly greater than 1")
         
-    best_sample, best_energy, constraint_values = _tangle_problem_iteration(graph, sampler, lamda, mu, P)
-    print(f'Best path={get_path(best_sample)}\nBest energy={best_energy}\nConstraint values={constraint_values}\n')
+    best_sample, best_energy, constraint_values = _tangle_problem_iteration(sampler, graph, lamda, mu, P)
+    print(f'Best path={get_path(best_sample)}\nBest energy={best_energy}\nConstraint values={list(zip(graph.nodes, constraint_values))}\n')
     while not all(constraint_values <= 0):
         lamda += (constraint_values > 0) * mu * constraint_values
         mu *= growth_factor
         
-        best_sample, best_energy, constraint_values = _tangle_problem_iteration(graph, sampler, lamda, mu, P)
-        print(f'Best path={get_path(best_sample)}\nBest energy={best_energy}\nConstraint values={constraint_values}\n')
+        best_sample, best_energy, constraint_values = _tangle_problem_iteration(sampler, graph, lamda, mu, P)
+        print(f'Best path={get_path(best_sample)}\nBest energy={best_energy}\nConstraint values={list(zip(graph.nodes, constraint_values))}\n')
 
     return best_sample, best_energy, lamda, mu

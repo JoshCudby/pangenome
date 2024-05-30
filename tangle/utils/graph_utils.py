@@ -2,12 +2,13 @@ import networkx as nx
 import gfapy
 
 
-def digraph_from_file(filename):
+def graph_from_file(filename):
     gfa = gfapy.Gfa.from_file(filename)
     digraph = nx.DiGraph()
-    for segment_line in gfa.segments:
+    # TODO: remove hacky truncation
+    for segment_line in gfa.segments[0:10]:
         digraph.add_node(segment_line.name, sequence=segment_line.sequence)
-    for edge_line in gfa.edges:
+    for edge_line in gfa.edges[0:20]:
         digraph.add_edges_from([
             (edge_line.sid1.name, edge_line.sid2.name),
             (edge_line.sid2.name, edge_line.sid1.name),
@@ -36,7 +37,7 @@ def setup_graph_for_qubo(graph, t_max):
     graph_copy = nx.DiGraph(graph)
     # Add virtual node to allow early finishes
     graph_copy.add_nodes_from(
-        [(len(list(graph.nodes)), {"weight": t_max})],
+        [("end", {"weight": t_max})],
     )    
     nodes = list(graph_copy.nodes)
     graph_copy.add_edges_from([
