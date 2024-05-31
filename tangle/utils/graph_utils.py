@@ -5,10 +5,9 @@ import gfapy
 def graph_from_file(filename):
     gfa = gfapy.Gfa.from_file(filename)
     digraph = nx.DiGraph()
-    # TODO: remove hacky truncation
-    for segment_line in gfa.segments[0:10]:
+    for segment_line in gfa.segments:
         digraph.add_node(segment_line.name, sequence=segment_line.sequence)
-    for edge_line in gfa.edges[0:20]:
+    for edge_line in gfa.edges:
         digraph.add_edges_from([
             (edge_line.sid1.name, edge_line.sid2.name),
             (edge_line.sid2.name, edge_line.sid1.name),

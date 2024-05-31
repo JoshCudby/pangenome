@@ -2,8 +2,8 @@ import networkx as nx
 import numpy as np
 from itertools import product
 from dimod.reference.samplers import SimulatedAnnealingSampler
-from dimod import BinaryQuadraticModel
-from dimod import Sampler
+from dimod import BinaryQuadraticModel, Sampler
+from dwave.system import LeapHybridSampler
 from utils.graph_utils import setup_graph_for_qubo
 from utils.sampling_utils import get_constraint_values, get_path
 
@@ -61,8 +61,7 @@ def _tangle_problem_bqm(graph: nx.Graph, lamda: list, mu: float, P: int) -> Bina
     return bqm
     
 
-# TODO: increase num_reads
-def _sample_bqm(sampler: Sampler, bqm: BinaryQuadraticModel, num_reads=1):
+def _sample_bqm(sampler: Sampler, bqm: BinaryQuadraticModel, num_reads=30):
     """Perform a batch of annealing on a given Binary Quadratic Model.
 
     Args:
@@ -73,7 +72,12 @@ def _sample_bqm(sampler: Sampler, bqm: BinaryQuadraticModel, num_reads=1):
     Returns:
         (dict, float): Returns the best sample and best energy of the batch.
     """
-    sampleset = sampler.sample(bqm, num_reads=num_reads)
+    if isinstance(sampler, LeapHybridSampler):
+        sampleset = sampler.sample(bqm, time_limit=6, label="Tangle QUBO")
+    elif isinstance(sampler, SimulatedAnnealingSampler):
+        sampleset = sampler.sample(bqm, num_reads=num_reads)
+    else:
+        raise Exception("Unknown Sampler type")
     best_sample = sampleset.first.sample
     best_energy = sampleset.first.energy
     return best_sample, best_energy
