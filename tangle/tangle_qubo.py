@@ -3,11 +3,12 @@ import re
 from random import uniform
 from dwave.system import LeapHybridSampler
 from dimod.reference import SimulatedAnnealingSampler
+from hybrid import SimulatedAnnealingProblemSampler
 from utils.qubo_utils import tangle_problem
 from utils.graph_utils import graph_from_file, toy_graph
 
 if __name__ == "__main__":
-    if len(sys.argv > 1):
+    if len(sys.argv) > 1:
         filename = sys.argv[1]
         graph = graph_from_file(filename)
     
@@ -29,5 +30,10 @@ if __name__ == "__main__":
     
     print(list(zip(list(graph.nodes), [graph.nodes[node]["weight"] for node in graph.nodes])))
     
-    sampler = LeapHybridSampler() if len(sys.argv > 2) and sys.argv[2] == 'q' else None
+    if len(sys.argv) > 2 and sys.argv[2] == 'q':
+        sampler = LeapHybridSampler()
+        print("Using Leap Hybrid Solver")
+    else:
+        sampler = SimulatedAnnealingSampler()
+        print("Using Classical Solver")
     sample, energy, lamda, mu = tangle_problem(graph, sampler)
