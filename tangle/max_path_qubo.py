@@ -36,7 +36,7 @@ if __name__ == "__main__":
     else:
         sampler = SimulatedAnnealingSampler()
         print("Using Classical Solver")
-    sample, energy = max_path_problem(graph, sampler)
-    best_path = get_max_path_problem_path_from_sample(sample)
-    print(f'Best path: {best_path}')
+    sample, energy, path = max_path_problem(graph, sampler)
+    
+    print(f'Best path: {path}')
     print(f'Energy of path: {energy}')

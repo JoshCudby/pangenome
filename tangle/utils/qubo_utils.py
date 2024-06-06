@@ -5,7 +5,7 @@ from dimod.reference.samplers import SimulatedAnnealingSampler
 from dimod import Sampler, BQM
 from dwave.system import LeapHybridSampler
 from utils.graph_utils import setup_graph_for_tangle_qubo, graph_to_max_path_digraph
-from utils.sampling_utils import get_constraint_values, get_path
+from utils.sampling_utils import get_constraint_values, get_path, get_max_path_problem_path_from_sample
 
 
 def _max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty) -> np.ndarray:
@@ -197,4 +197,6 @@ def max_path_problem(graph: nx.Graph, sampler=None, penalty=None):
     bqm.offset = penalty * (2*W + 4)
     
     best_sample, best_energy = _sample_bqm(sampler, bqm)
-    return best_sample, best_energy
+    
+    best_path = get_max_path_problem_path_from_sample(best_sample, dg)
+    return best_sample, best_energy, best_path

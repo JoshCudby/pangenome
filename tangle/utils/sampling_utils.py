@@ -28,10 +28,11 @@ def _index_to_node_time(idx, nodes):
     return (div, rem)
 
 
-def get_max_path_problem_path_from_sample(sample, dg: nx.DiGraph):
+def get_max_path_problem_path_from_sample(sample, dg: nx.DiGraph) -> list:
     on_vars = []
     for i in range(len(sample.keys())):
         if sample[i] == 1:
             on_vars.append(i)
     path = [_index_to_node_time(x, len(dg.nodes)) for x in on_vars]
     path = [(e[0], list(dg.nodes)[e[1]]) for e in path]
+    return path
