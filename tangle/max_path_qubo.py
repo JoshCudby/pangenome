@@ -3,14 +3,14 @@ import re
 from random import uniform
 from dwave.system import LeapHybridSampler
 from dimod.reference import SimulatedAnnealingSampler
-from hybrid import SimulatedAnnealingProblemSampler
-from utils.qubo_utils import tangle_problem
-from utils.graph_utils import digraph_from_gfa_file, toy_graph
+from utils.qubo_utils import max_path_problem
+from utils.graph_utils import graph_from_gfa_file, toy_graph
+from utils.sampling_utils import get_max_path_problem_path_from_sample
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         filename = sys.argv[1]
-        graph = digraph_from_gfa_file(filename)
+        graph = graph_from_gfa_file(filename)
     
         # Hacky weight assignment
         for node in graph.nodes:
@@ -36,4 +36,7 @@ if __name__ == "__main__":
     else:
         sampler = SimulatedAnnealingSampler()
         print("Using Classical Solver")
-    sample, energy, lamda, mu = tangle_problem(graph, sampler)
+    sample, energy = max_path_problem(graph, sampler)
+    best_path = get_max_path_problem_path_from_sample(sample)
+    print(f'Best path: {best_path}')
+    print(f'Energy of path: {energy}')

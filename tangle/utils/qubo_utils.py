@@ -2,13 +2,46 @@ import networkx as nx
 import numpy as np
 from itertools import product
 from dimod.reference.samplers import SimulatedAnnealingSampler
-from dimod import BinaryQuadraticModel, Sampler
+from dimod import Sampler, BQM
 from dwave.system import LeapHybridSampler
-from utils.graph_utils import setup_graph_for_qubo
+from utils.graph_utils import setup_graph_for_tangle_qubo, graph_to_max_path_digraph
 from utils.sampling_utils import get_constraint_values, get_path
 
 
-def _tangle_problem_bqm(graph: nx.Graph, lamda: list, mu: float, P: int) -> BinaryQuadraticModel:
+def _max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty) -> np.ndarray:
+    nodes = list(graph.nodes)
+    end_node = nodes[-1]
+    W = len(nodes) - 1
+    
+    qubo_matrix = np.zeros(shape=(W+1, W+1, W+1, W+1), dtype=int)
+    for t in range(W):
+        for i, j in product(range(W+1), range(W+1)):
+            if (nodes[i], nodes[j]) not in graph.edges:
+                qubo_matrix[t, i, t+1, j] += penalty
+            else:
+                qubo_matrix[t, i, t+1, j] += -1 if (nodes[i] != end_node and nodes[j] != end_node) else 0
+    
+    for t in range(W+1):
+        for i in range(W+1):
+            qubo_matrix[t, i, t, i] -= penalty
+            for j in range(i+1, W+1):
+                qubo_matrix[t, i, t, j] += 2 * penalty
+                
+    for i in range(W+1):
+        for t1 in range(W+1):
+            qubo_matrix[t1, i, t1, i] -= penalty
+            for t2 in range(t1+1, W+1):
+                qubo_matrix[t1, i, t2, i] += 2 * penalty
+    
+    qubo_matrix[1, 1, 1, 1] -= penalty
+    qubo_matrix[W, W, W, W] -= penalty
+    
+    qubo_matrix = qubo_matrix.reshape(((W+1)**2, (W+1)**2))
+    
+    return qubo_matrix
+
+
+def _tangle_problem_bqm(graph: nx.Graph, lamda: list, mu: float, P: int) -> BQM:
     """Returns a Binary Quadratic Model for the tangle problem.
     
     The tangle problem is to find the longest path through a node-weighted graph, where any node can be visited at most its weight many times.
@@ -16,10 +49,10 @@ def _tangle_problem_bqm(graph: nx.Graph, lamda: list, mu: float, P: int) -> Bina
     Args:
         graph (nx.Graph): the node-weighted graph which underlies the tangle problem
     """
-    bqm = BinaryQuadraticModel({}, {}, 0, "BINARY")
+    bqm = BQM({}, {}, 0, "BINARY")
     t_max = sum(graph.nodes.data()[node]["weight"] for node in graph.nodes) + 1
     
-    qubo_graph = setup_graph_for_qubo(graph, t_max)
+    qubo_graph = setup_graph_for_tangle_qubo(graph, t_max)
     nodes = list(qubo_graph.nodes)
     edges = list(qubo_graph.edges)
     
@@ -61,12 +94,12 @@ def _tangle_problem_bqm(graph: nx.Graph, lamda: list, mu: float, P: int) -> Bina
     return bqm
     
 
-def _sample_bqm(sampler: Sampler, bqm: BinaryQuadraticModel, num_reads=30):
+def _sample_bqm(sampler: Sampler, bqm: BQM, num_reads=30):
     """Perform a batch of annealing on a given Binary Quadratic Model.
 
     Args:
         sampler (Sampler): The sampler to anneal with.
-        bqm (BinaryQuadraticModel): The model to anneal.
+        bqm (BQM): The model to anneal.
         num_reads (int, optional): Number of runs in batch. Defaults to 30.
 
     Returns:
@@ -140,3 +173,28 @@ def tangle_problem(graph: nx.DiGraph, sampler=None, lamda=None, mu=0.5, growth_f
         print(f'Best path={get_path(best_sample)}\nBest energy={best_energy}\nConstraint values={list(zip(graph.nodes, constraint_values))}\n')
 
     return best_sample, best_energy, lamda, mu
+
+
+def max_path_problem(graph: nx.Graph, sampler=None, penalty=None):
+    """Solves the max path problem on a node-weighted graph.
+
+    Args:
+        graph (nx.Graph): The underlying graph.
+        sampler (Sampler, optional): The sampler to use. Defaults to SimulatedAnnealingSampler.
+        penalty (int, optional): The penalty for breaking constraints. Defaults to total weight of graph.
+    """
+    if sampler is None:
+        sampler = SimulatedAnnealingSampler()
+    
+    dg = graph_to_max_path_digraph(graph)
+    W = len(dg.nodes) - 1
+    
+    if penalty is None:
+        penalty = W
+    
+    qubo_matrix = _max_path_problem_qubo_matrix(dg, penalty)
+    bqm = BQM(qubo_matrix, 'BINARY')
+    bqm.offset = penalty * (2*W + 4)
+    
+    best_sample, best_energy = _sample_bqm(sampler, bqm)
+    return best_sample, best_energy

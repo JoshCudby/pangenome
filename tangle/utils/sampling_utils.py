@@ -1,6 +1,6 @@
 import numpy as np
 import networkx as nx
-
+from math import floor
 
 def get_path(sample: dict):
     return sorted([i for i in list(sample.keys()) if sample[i]], key=lambda e: e[1])
@@ -20,3 +20,18 @@ def get_constraint_values(sample: dict, graph: nx.DiGraph):
     node_visits = get_node_visits(sample)
     constraint_values = np.array([node_visits[x] - graph.nodes.data()[x]["weight"] for x in list(graph.nodes)])
     return constraint_values
+
+
+def _index_to_node_time(idx, nodes):
+    rem = idx % nodes
+    div = floor(idx / nodes)
+    return (div, rem)
+
+
+def get_max_path_problem_path_from_sample(sample, dg: nx.DiGraph):
+    on_vars = []
+    for i in range(len(sample.keys())):
+        if sample[i] == 1:
+            on_vars.append(i)
+    path = [_index_to_node_time(x, len(dg.nodes)) for x in on_vars]
+    path = [(e[0], list(dg.nodes)[e[1]]) for e in path]
