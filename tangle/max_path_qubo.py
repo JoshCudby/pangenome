@@ -5,7 +5,6 @@ from dwave.system import LeapHybridSampler
 from dimod.reference import SimulatedAnnealingSampler
 from utils.qubo_utils import max_path_problem
 from utils.graph_utils import graph_from_gfa_file, toy_graph
-from utils.sampling_utils import get_max_path_problem_path_from_sample
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
