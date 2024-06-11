@@ -14,6 +14,7 @@ def _max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty) -> np.ndarray:
     W = len(nodes) - 1
     
     qubo_matrix = np.zeros(shape=(W+1, W+1, W+1, W+1), dtype=int)
+    # Reward travelling along real edges
     for t in range(W):
         for i, j in product(range(W+1), range(W+1)):
             if (nodes[i], nodes[j]) not in graph.edges:
@@ -21,18 +22,20 @@ def _max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty) -> np.ndarray:
             else:
                 qubo_matrix[t, i, t+1, j] += -1 if (nodes[i] != end_node and nodes[j] != end_node) else 0
     
+    # Penalise multiple locations at one time
     for t in range(W+1):
         for i in range(W+1):
             qubo_matrix[t, i, t, i] -= penalty
             for j in range(i+1, W+1):
                 qubo_matrix[t, i, t, j] += 2 * penalty
-                
+           
+    # Penalise multiple visits to a real node     
     for i in range(W):
         for t1 in range(W+1):
             for t2 in range(t1+1, W+1):
                 qubo_matrix[t1, i, t2, i] += penalty
     
-    qubo_matrix[1, 1, 1, 1] -= penalty
+    qubo_matrix[0, 0, 0, 0] -= penalty
     qubo_matrix[W, W, W, W] -= penalty
     
     qubo_matrix = qubo_matrix.reshape(((W+1)**2, (W+1)**2))
@@ -105,7 +108,7 @@ def _sample_bqm(sampler: Sampler, bqm: BQM, num_reads=30, label="QUBO"):
         (dict, float): Returns the best sample and best energy of the batch.
     """
     if isinstance(sampler, LeapHybridSampler):
-        sampleset = sampler.sample(bqm, time_limit=60, label=label)
+        sampleset = sampler.sample(bqm, label=label)
     elif isinstance(sampler, SimulatedAnnealingSampler):
         sampleset = sampler.sample(bqm, num_reads=num_reads)
     else:

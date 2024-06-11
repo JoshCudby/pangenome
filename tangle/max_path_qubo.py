@@ -6,7 +6,7 @@ from datetime import datetime
 from random import uniform
 from dwave.system import LeapHybridSampler
 from dimod.reference import SimulatedAnnealingSampler
-from utils.qubo_utils import max_path_problem
+from utils.qubo_utils import max_path_problem, _max_path_problem_qubo_matrix
 from utils.graph_utils import graph_from_gfa_file, toy_graph
 
 if __name__ == "__main__":
@@ -25,7 +25,7 @@ if __name__ == "__main__":
             elif re.search("i\d", node):
                 graph.nodes[node]["weight"] = 1 if uniform(0, 1) > 0.5 else 0
             else:
-                graph.nodes[node]["weight"] = 0
+                graph.nodes[node] = 0
     
     else:
         graph = toy_graph(exact_solution=False)
@@ -39,7 +39,8 @@ if __name__ == "__main__":
     else:
         solver = "classical"
         sampler = SimulatedAnnealingSampler()
-        print("Using Classical Solver")
+        print("Using Classical Solver")    
+   
     sample, energy, path = max_path_problem(graph, sampler)
     
     print(f"Best path: {path}")
