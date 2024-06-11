@@ -93,7 +93,7 @@ def _tangle_problem_bqm(graph: nx.Graph, lamda: list, mu: float, P: int) -> BQM:
     return bqm
     
 
-def _sample_bqm(sampler: Sampler, bqm: BQM, num_reads=30):
+def _sample_bqm(sampler: Sampler, bqm: BQM, num_reads=30, label="QUBO"):
     """Perform a batch of annealing on a given Binary Quadratic Model.
 
     Args:
@@ -105,7 +105,7 @@ def _sample_bqm(sampler: Sampler, bqm: BQM, num_reads=30):
         (dict, float): Returns the best sample and best energy of the batch.
     """
     if isinstance(sampler, LeapHybridSampler):
-        sampleset = sampler.sample(bqm, time_limit=6, label="Tangle QUBO")
+        sampleset = sampler.sample(bqm, time_limit=6, label=label)
     elif isinstance(sampler, SimulatedAnnealingSampler):
         sampleset = sampler.sample(bqm, num_reads=num_reads)
     else:
@@ -195,7 +195,7 @@ def max_path_problem(graph: nx.Graph, sampler=None, penalty=None):
     bqm = BQM(qubo_matrix, 'BINARY')
     bqm.offset = penalty * (2*W + 4)
     
-    best_sample, best_energy = _sample_bqm(sampler, bqm)
+    best_sample, best_energy = _sample_bqm(sampler, bqm, label="Max Path QUBO")
     
     best_path = get_max_path_problem_path_from_sample(best_sample, dg)
     return best_sample, best_energy, best_path

@@ -29,6 +29,8 @@ if len(sys.argv) > 1:
 else:
     graph = toy_graph(exact_solution=True)
 
+print(list(zip(list(graph.nodes), [graph.nodes[node]["weight"] for node in graph.nodes])))
+
 dg = graph_to_max_path_digraph(graph)
 W = len(dg.nodes) - 1
 penalty = W
