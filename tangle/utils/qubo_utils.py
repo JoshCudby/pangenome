@@ -105,7 +105,7 @@ def _sample_bqm(sampler: Sampler, bqm: BQM, num_reads=30, label="QUBO"):
         (dict, float): Returns the best sample and best energy of the batch.
     """
     if isinstance(sampler, LeapHybridSampler):
-        sampleset = sampler.sample(bqm, time_limit=6, label=label)
+        sampleset = sampler.sample(bqm, time_limit=60, label=label)
     elif isinstance(sampler, SimulatedAnnealingSampler):
         sampleset = sampler.sample(bqm, num_reads=num_reads)
     else:
@@ -193,7 +193,7 @@ def max_path_problem(graph: nx.Graph, sampler=None, penalty=None):
     
     qubo_matrix = _max_path_problem_qubo_matrix(dg, penalty)
     bqm = BQM(qubo_matrix, 'BINARY')
-    bqm.offset = penalty * (2*W + 4)
+    bqm.offset = penalty * (W + 3)
     
     best_sample, best_energy = _sample_bqm(sampler, bqm, label="Max Path QUBO")
     
