@@ -24,6 +24,12 @@ if __name__ == "__main__":
                 graph.nodes[node]["weight"] = 1
             elif re.search("^c6a1*$", node):
                 graph.nodes[node]["weight"] = 1
+            elif re.search("^cnv*$", node):
+                graph.nodes[node]["weight"] = 3
+            elif re.search("^cnvlink*$", node):
+                graph.nodes[node]["weight"] = 1
+            elif re.search("^cnvstr*$", node):
+                graph.nodes[node]["weight"] = 5
             elif re.search("i\d", node):
                 graph.nodes[node]["weight"] = 1 if uniform(0, 1) > 0.5 else 0
             else:
