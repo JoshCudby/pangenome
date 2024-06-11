@@ -197,6 +197,9 @@ def max_path_problem(graph: nx.Graph, sampler=None, penalty=None):
     qubo_matrix = _max_path_problem_qubo_matrix(dg, penalty)
     bqm = BQM(qubo_matrix, 'BINARY')
     bqm.offset = penalty * (W + 3)
+    print(f'Number of nodes: {W + 1}')
+    print(f'Number of edges: {len(dg.edges)}')
+    print(f'Number of QUBO vars: {len(bqm.variables)}')
     
     best_sample, best_energy = _sample_bqm(sampler, bqm, label="Max Path QUBO")
     
