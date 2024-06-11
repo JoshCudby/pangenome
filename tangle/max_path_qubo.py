@@ -25,7 +25,7 @@ if __name__ == "__main__":
             elif re.search("i\d", node):
                 graph.nodes[node]["weight"] = 1 if uniform(0, 1) > 0.5 else 0
             else:
-                graph.nodes[node] = 0
+                graph.nodes[node]["weight"] = 0
     
     else:
         graph = toy_graph(exact_solution=False)
