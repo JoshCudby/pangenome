@@ -1,5 +1,8 @@
 import sys
 import re
+import os
+import numpy as np
+from datetime import datetime
 from random import uniform
 from dwave.system import LeapHybridSampler
 from dimod.reference import SimulatedAnnealingSampler
@@ -30,12 +33,24 @@ if __name__ == "__main__":
     print(list(zip(list(graph.nodes), [graph.nodes[node]["weight"] for node in graph.nodes])))
     
     if len(sys.argv) > 2 and sys.argv[2] == 'q':
+        solver = "quantum"
         sampler = LeapHybridSampler()
         print("Using Leap Hybrid Solver")
     else:
+        solver = "classical"
         sampler = SimulatedAnnealingSampler()
         print("Using Classical Solver")
     sample, energy, path = max_path_problem(graph, sampler)
     
-    print(f'Best path: {path}')
-    print(f'Energy of path: {energy}')
+    print(f"Best path: {path}")
+    print(f"Energy of path: {energy}")
+    
+    save_dir = "out"
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
+        
+    now = datetime.now().strftime("%d%m%Y_%H%M")
+    save_file = save_dir + f"/qubo_path_{solver}_{now}"   
+        
+    to_save = np.array([sample, energy, path], dtype=object)
+    np.save(save_file, to_save)

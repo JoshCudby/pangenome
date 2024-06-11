@@ -27,11 +27,10 @@ def _max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty) -> np.ndarray:
             for j in range(i+1, W+1):
                 qubo_matrix[t, i, t, j] += 2 * penalty
                 
-    for i in range(W+1):
+    for i in range(W):
         for t1 in range(W+1):
-            qubo_matrix[t1, i, t1, i] -= penalty
             for t2 in range(t1+1, W+1):
-                qubo_matrix[t1, i, t2, i] += 2 * penalty
+                qubo_matrix[t1, i, t2, i] += penalty
     
     qubo_matrix[1, 1, 1, 1] -= penalty
     qubo_matrix[W, W, W, W] -= penalty
