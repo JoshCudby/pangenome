@@ -22,6 +22,8 @@ if __name__ == "__main__":
                 graph.nodes[node]["weight"] = 2
             elif re.search("^a1c\d*$", node):
                 graph.nodes[node]["weight"] = 1
+            elif re.search("^c6a1*$", node):
+                graph.nodes[node]["weight"] = 1
             elif re.search("i\d", node):
                 graph.nodes[node]["weight"] = 1 if uniform(0, 1) > 0.5 else 0
             else:
