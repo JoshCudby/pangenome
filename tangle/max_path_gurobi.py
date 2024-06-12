@@ -36,13 +36,18 @@ W = len(dg.nodes) - 1
 penalty = W
 
 qubo_matrix = _max_path_problem_qubo_matrix(dg, penalty)
+offset = penalty * (W + 3)
 
 with gp.Env() as env, gp.Model(env=env) as model:
     vars = model.addMVar(shape=qubo_matrix.shape[0], vtype=GRB.BINARY, name="x")
     model.setObjective(vars @ qubo_matrix @ vars, GRB.MINIMIZE)
+    model.Params.BestObjStop = -W - offset + 1
+    model.Params.MIPFocus = 1
+    model.Params.ImproveStartTime = 1200
     model.optimize()
     
     print(vars.X)
     print(get_max_path_problem_path_from_gurobi(vars.X, dg))
     print('Obj: %g' % model.ObjVal)
-    print(f'Offset: {penalty * (W + 3)}')
+    print(f'Offset: {offset}')
+    print(f'Best possible score: {-W - offset + 1}')

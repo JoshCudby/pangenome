@@ -6,7 +6,7 @@ from datetime import datetime
 from random import uniform
 from dwave.system import LeapHybridSampler
 from dimod.reference import SimulatedAnnealingSampler
-from utils.qubo_utils import max_path_problem, _max_path_problem_qubo_matrix
+from utils.qubo_utils import max_path_problem
 from utils.graph_utils import graph_from_gfa_file, toy_graph
 
 if __name__ == "__main__":
