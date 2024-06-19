@@ -1,3 +1,6 @@
 [submodule "MQLib"]
 	path = MQLib
 	url = https://github.com/MQLib/MQLib
+[submodule "pggb"]
+	path = pggb
+	url = https://github.com/pangenome/pggb.git
