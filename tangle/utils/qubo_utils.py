@@ -8,7 +8,7 @@ from utils.graph_utils import setup_graph_for_tangle_qubo, graph_to_max_path_dig
 from utils.sampling_utils import get_constraint_values, get_path, get_max_path_problem_path_from_sample
 
 
-def _max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty) -> np.ndarray:
+def max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty) -> np.ndarray:
     nodes = list(graph.nodes)
     end_node = nodes[-1]
     W = len(nodes) - 1
@@ -35,7 +35,14 @@ def _max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty) -> np.ndarray:
             for t2 in range(t1+1, W+1):
                 qubo_matrix[t1, i, t2, i] += penalty
     
-    qubo_matrix[0, 0, 0, 0] -= penalty
+    # Reward starting at the start
+    for i in range(W):
+        try:
+            if graph.nodes[nodes[i]]["start"] == "start":
+                qubo_matrix[0, i, 0, i] -= penalty
+        except:
+            pass
+    # Reward ending at the end
     qubo_matrix[W, W, W, W] -= penalty
     
     qubo_matrix = qubo_matrix.reshape(((W+1)**2, (W+1)**2))
@@ -195,7 +202,7 @@ def max_path_problem(graph: nx.Graph, sampler=None, penalty=None):
     if penalty is None:
         penalty = W
     
-    qubo_matrix = _max_path_problem_qubo_matrix(dg, penalty)
+    qubo_matrix = max_path_problem_qubo_matrix(dg, penalty)
     bqm = BQM(qubo_matrix, 'BINARY')
     bqm.offset = penalty * (W + 3)
     print(f'Number of nodes: {W + 1}')

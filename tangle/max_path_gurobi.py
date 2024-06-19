@@ -3,16 +3,21 @@ from gurobipy import GRB
 import numpy as np
 import sys
 import re
+import os
 from random import uniform
-from utils.qubo_utils import graph_to_max_path_digraph, _max_path_problem_qubo_matrix
-from utils.graph_utils import graph_from_gfa_file, toy_graph
+from utils.qubo_utils import graph_to_max_path_digraph, max_path_problem_qubo_matrix
+from utils.graph_utils import graph_from_gfa_file, toy_graph, normalise_node_weights
 from utils.sampling_utils import get_max_path_problem_path_from_gurobi
 
 
 if len(sys.argv) > 1:
-        filename = sys.argv[1]
-        graph = graph_from_gfa_file(filename)
-    
+    filename = sys.argv[1]
+    graph = graph_from_gfa_file(filename)
+
+    try:
+        for node in graph.nodes:
+            graph.nodes[node]["weight"]
+    except KeyError:
         # Hacky weight assignment
         for node in graph.nodes:
             if re.search("^c\d*$", node):
@@ -27,19 +32,31 @@ if len(sys.argv) > 1:
                 graph.nodes[node]["weight"] = 0
     
 else:
+    filename = 'toy'
     graph = toy_graph(exact_solution=True)
 
 print(list(zip(list(graph.nodes), [graph.nodes[node]["weight"] for node in graph.nodes])))
+
+if len(sys.argv) > 2:
+    print('Trying to normalise')
+    try:
+        normalisation = int(sys.argv[2])
+        print(f'Normalising by {normalisation}')
+        graph = normalise_node_weights(graph, normalisation)
+    except ValueError:
+        graph = normalise_node_weights(graph, 1)
+else:
+    graph = normalise_node_weights(graph, 1)
 
 dg = graph_to_max_path_digraph(graph)
 W = len(dg.nodes) - 1
 penalty = W
 
-qubo_matrix = _max_path_problem_qubo_matrix(dg, penalty)
+qubo_matrix = max_path_problem_qubo_matrix(dg, penalty)
 
 non_zero = np.nonzero(qubo_matrix)
 non_zero_count = int(non_zero[0].shape[0] / 2 + qubo_matrix.shape[0] / 2)
-f = open(f'out/mqlib_qubo_W_{W}.txt', 'w')
+f = open(f'out/mqlib_qubo_W_{W}_{os.path.basename(filename)}.txt', 'w')
 f.write(f'{qubo_matrix.shape[0]} {non_zero_count}\n')
 for i in range(qubo_matrix.shape[0]):
     for j in range(i, qubo_matrix.shape[0]):

@@ -28,7 +28,7 @@ def digraph_from_gfa_file(filename) -> nx.DiGraph:
     gfa = gfapy.Gfa.from_file(filename)
     digraph = nx.DiGraph()
     for segment_line in gfa.segments:
-        digraph.add_node(segment_line.name, sequence=segment_line.sequence, weight=segment_line.SC)
+        digraph.add_node(segment_line.name, sequence=segment_line.sequence, weight=segment_line.SC, start=segment_line.st)
     for edge_line in gfa.edges:
         digraph.add_edges_from([
             (edge_line.sid1.name, edge_line.sid2.name),
@@ -41,7 +41,7 @@ def graph_from_gfa_file(filename: str) -> nx.Graph:
     gfa = gfapy.Gfa.from_file(filename)
     graph = nx.Graph()
     for segment_line in gfa.segments:
-        graph.add_node(segment_line.name, sequence=segment_line.sequence, weight=segment_line.SC)
+        graph.add_node(segment_line.name, sequence=segment_line.sequence, weight=segment_line.SC, start=segment_line.st)
     for edge_line in gfa.edges:
         graph.add_edges_from([
             (edge_line.sid1.name, edge_line.sid2.name)
@@ -80,7 +80,7 @@ def setup_graph_for_tangle_qubo(graph, t_max):
     return graph_copy
 
 
-def graph_to_max_path_digraph(graph: nx.Graph, final_node=None):
+def graph_to_max_path_digraph(graph: nx.Graph):
     dg = nx.DiGraph()
     for node in graph.nodes:
         weight = graph.nodes[node]["normalised_weight"]
@@ -105,11 +105,15 @@ def graph_to_max_path_digraph(graph: nx.Graph, final_node=None):
                 )
         
     dg.add_node('end')
-    if final_node is None:
-        final_node = list(graph.nodes)[-1]
-    weight = graph.nodes[final_node]["normalised_weight"]
-    for i in range(weight):
-        dg.add_edge(f'{final_node}_{i}', 'end')     
+    for node in graph.nodes:
+        try:
+            if graph.nodes[node]["start"] == "end":
+                weight = graph.nodes[node]["normalised_weight"]
+                for i in range(weight):
+                    dg.add_edge(f'{node}_{i}', 'end')     
+        except:
+            pass
+    
     dg.add_edge('end', 'end')        
     
     return dg
