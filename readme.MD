@@ -11,7 +11,7 @@ Packages:
 - gurobipy
 - networkx
 
-See `environment.yml`.
+See `environment_from_history.yml` for a list of installed packages.
 
 To use the Gurobi solver, you will need to obtain a licence. Instructions available at https://support.gurobi.com/hc/en-us/articles/14799677517585-Getting-Started-with-Gurobi-Optimizer .
 
