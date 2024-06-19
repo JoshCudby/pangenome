@@ -110,7 +110,12 @@ def graph_to_max_path_digraph(graph: nx.Graph):
             if graph.nodes[node]["start"] == "end":
                 weight = graph.nodes[node]["normalised_weight"]
                 for i in range(weight):
-                    dg.add_edge(f'{node}_{i}', 'end')     
+                    dg.add_edge(f'{node}_{i}', 'end')
+                    dg.nodes[f'{node}_{i}']["start"] = "end"
+            elif graph.nodes[node]["start"] == "start":
+                weight = graph.nodes[node]["normalised_weight"]
+                for i in range(weight):
+                    dg.nodes[f'{node}_{i}']["start"] = "start"
         except:
             pass
     
