@@ -39,6 +39,7 @@ def _max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty) -> np.ndarray:
     qubo_matrix[W, W, W, W] -= penalty
     
     qubo_matrix = qubo_matrix.reshape(((W+1)**2, (W+1)**2))
+    qubo_matrix = 0.5 * (qubo_matrix + qubo_matrix.T)
     
     return qubo_matrix
 

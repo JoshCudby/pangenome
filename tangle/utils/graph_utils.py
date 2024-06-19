@@ -1,12 +1,34 @@
 import networkx as nx
 import gfapy
+from math import remainder
+from scipy.optimize import minimize
+
+
+def normalise_node_weights(graph: nx.Graph, normalisation: float):
+    for node in graph.nodes:
+        graph.nodes[node]["normalised_weight"] = round(graph.nodes[node]["weight"] / normalisation)
+    return graph
+
+
+def _coverage_cost_function(x, digraph):
+    print(x)
+    return sum((remainder(digraph.nodes[node]["weight"], x)) ** 2 for node in digraph.nodes)
+
+
+def get_normalised_node_weights(graph: nx.Graph) -> tuple[nx.Graph, float]:
+    total_node_weight = sum(graph.nodes[node]["weight"] for node in graph.nodes)
+    average_node_weight = total_node_weight / len(graph.nodes)
+    optimized_coverage = minimize(_coverage_cost_function, average_node_weight, graph, bounds=[(2, 1000)]).x[0]
+    for node in graph.nodes:
+        graph.nodes[node]["normalised_weight"] = round(graph.nodes[node]["weight"] / optimized_coverage)
+    return graph, optimized_coverage
 
 
 def digraph_from_gfa_file(filename) -> nx.DiGraph:
     gfa = gfapy.Gfa.from_file(filename)
     digraph = nx.DiGraph()
     for segment_line in gfa.segments:
-        digraph.add_node(segment_line.name, sequence=segment_line.sequence)
+        digraph.add_node(segment_line.name, sequence=segment_line.sequence, weight=segment_line.SC)
     for edge_line in gfa.edges:
         digraph.add_edges_from([
             (edge_line.sid1.name, edge_line.sid2.name),
@@ -15,11 +37,11 @@ def digraph_from_gfa_file(filename) -> nx.DiGraph:
     return digraph
 
 
-def graph_from_gfa_file(filename) -> nx.Graph:
+def graph_from_gfa_file(filename: str) -> nx.Graph:
     gfa = gfapy.Gfa.from_file(filename)
     graph = nx.Graph()
     for segment_line in gfa.segments:
-        graph.add_node(segment_line.name, sequence=segment_line.sequence)
+        graph.add_node(segment_line.name, sequence=segment_line.sequence, weight=segment_line.SC)
     for edge_line in gfa.edges:
         graph.add_edges_from([
             (edge_line.sid1.name, edge_line.sid2.name)
@@ -61,14 +83,14 @@ def setup_graph_for_tangle_qubo(graph, t_max):
 def graph_to_max_path_digraph(graph: nx.Graph, final_node=None):
     dg = nx.DiGraph()
     for node in graph.nodes:
-        weight = graph.nodes.data()[node]["weight"]
+        weight = graph.nodes[node]["normalised_weight"]
         for k in range(weight):
             dg.add_node(f'{node}_{k}')
         
     for edge in graph.edges:
         if not edge[0] == edge[1]:
-            weight_i = graph.nodes.data()[edge[0]]["weight"]
-            weight_j = graph.nodes.data()[edge[1]]["weight"]
+            weight_i = graph.nodes[edge[0]]["normalised_weight"]
+            weight_j = graph.nodes[edge[1]]["normalised_weight"]
             for i in range(weight_i):
                 for j in range(weight_j):
                     dg.add_edges_from([
@@ -76,7 +98,7 @@ def graph_to_max_path_digraph(graph: nx.Graph, final_node=None):
                         (f'{edge[1]}_{j}', f'{edge[0]}_{i}')
                     ])
         else:
-            weight = graph.nodes.data()[edge[0]]["weight"]
+            weight = graph.nodes[edge[0]]["normalised_weight"]
             for i in range(weight - 1):
                 dg.add_edge(
                     f'{edge[0]}_{i}', f'{edge[0]}_{i + 1}'
@@ -85,7 +107,7 @@ def graph_to_max_path_digraph(graph: nx.Graph, final_node=None):
     dg.add_node('end')
     if final_node is None:
         final_node = list(graph.nodes)[-1]
-    weight = graph.nodes.data()[final_node]["weight"]
+    weight = graph.nodes[final_node]["normalised_weight"]
     for i in range(weight):
         dg.add_edge(f'{final_node}_{i}', 'end')     
     dg.add_edge('end', 'end')        

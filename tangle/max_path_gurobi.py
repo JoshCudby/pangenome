@@ -36,6 +36,16 @@ W = len(dg.nodes) - 1
 penalty = W
 
 qubo_matrix = _max_path_problem_qubo_matrix(dg, penalty)
+
+non_zero = np.nonzero(qubo_matrix)
+non_zero_count = int(non_zero[0].shape[0] / 2 + qubo_matrix.shape[0] / 2)
+f = open(f'out/mqlib_qubo_W_{W}.txt', 'w')
+f.write(f'{qubo_matrix.shape[0]} {non_zero_count}\n')
+for i in range(qubo_matrix.shape[0]):
+    for j in range(i, qubo_matrix.shape[0]):
+        if not qubo_matrix[i, j] == 0: 
+            f.write(f'{i + 1} {j + 1} {-qubo_matrix[i, j]}\n')
+    
 offset = penalty * (W + 3)
 
 with gp.Env() as env, gp.Model(env=env) as model:
