@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+
 usage()
 {
     echo "usage: solver_benchmark [[[-f file ] [-n normalisation] [-t time limit] [-m memory]] | [-h]]"
@@ -75,5 +75,4 @@ printf "\n\n"
 echo "D-Wave Solver"
 bsub -R "select[mem>1000] rusage[mem=1000]"  -M "1000" -o "out/dwave.$filename" -e "out/error.dwave.$filename" -G "qpg" "python3 ./tangle/max_path_qubo.py ./tangle/data/$filename $normalisation q"
 
-set +x
 exit 0
