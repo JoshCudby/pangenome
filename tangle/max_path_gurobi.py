@@ -35,8 +35,6 @@ else:
     filename = 'toy'
     graph = toy_graph(exact_solution=True)
 
-print(list(zip(list(graph.nodes), [graph.nodes[node]["weight"] for node in graph.nodes])))
-
 if len(sys.argv) > 2:
     print('Trying to normalise')
     try:
@@ -47,6 +45,16 @@ if len(sys.argv) > 2:
         graph = normalise_node_weights(graph, 1)
 else:
     graph = normalise_node_weights(graph, 1)
+    
+print(list(zip(list(graph.nodes), [graph.nodes[node]["weight"] for node in graph.nodes])))
+    
+if len(sys.argv) > 3:
+    try:
+        time_limit = int(sys.argv[3])
+    except ValueError:
+        time_limit = 60
+else:
+    time_limit = 60
 
 dg = graph_to_max_path_digraph(graph)
 W = len(dg.nodes) - 1
@@ -54,9 +62,10 @@ penalty = W
 
 qubo_matrix = max_path_problem_qubo_matrix(dg, penalty)
 
+# Write to MQLib Format
 non_zero = np.nonzero(qubo_matrix)
 non_zero_count = int(non_zero[0].shape[0] / 2 + qubo_matrix.shape[0] / 2)
-f = open(f'out/mqlib_qubo_W_{W}_{os.path.basename(filename)}.txt', 'w')
+f = open(f'out/mqlib_qubo_{os.path.basename(filename)}.txt', 'w')
 f.write(f'{qubo_matrix.shape[0]} {non_zero_count}\n')
 for i in range(qubo_matrix.shape[0]):
     for j in range(i, qubo_matrix.shape[0]):
@@ -71,6 +80,7 @@ with gp.Env() as env, gp.Model(env=env) as model:
     model.Params.BestObjStop = -W - offset + 1
     model.Params.MIPFocus = 1
     model.Params.ImproveStartTime = 1200
+    model.Params.TimeLimit = time_limit
     model.optimize()
     
     print(vars.X)

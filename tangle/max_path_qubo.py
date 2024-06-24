@@ -65,8 +65,6 @@ if __name__ == "__main__":
     else:
         graph = toy_graph(exact_solution=False)
     
-    print(list(zip(list(graph.nodes), [graph.nodes[node]["weight"] for node in graph.nodes])))
-    
     if len(sys.argv) > 2:
         print('Trying to normalise')
         try:
@@ -90,9 +88,13 @@ if __name__ == "__main__":
         print("Using Classical Solver")    
    
     sample, energy, path = max_path_problem(graph, sampler)
-    
     print(f"Best path: {path}")
     print(f"Energy of path: {energy}")
+    for i in range(len(path) - 1):
+        v1 = path[i][1][0:-2]
+        v2 = path[i + 1][1][0:-2]
+        if not (v1, v2) in graph.edges and not path[i + 1][1] == 'end':
+            print(f'Broke graph edge at step {i}')
     
     save_dir = "out"
     if not os.path.exists(save_dir):
