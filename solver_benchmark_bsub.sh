@@ -63,12 +63,12 @@ esac
 # Gurobi solver
 printf "\n\n"
 echo "Gurobi Solver"
-bsub -R '"select[mem>'"$memory"'] rusage[mem='"$memory"']"'  -M "$memory" -o "out/gurobi.$filename" -e "out/error.gurobi.$filename" -G "qpg" "python3 ./tangle/max_path_gurobi.py ./tangle/data/$filename $normalisation $time_limit"
+bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/gurobi.$filename" -e "out/error.gurobi.$filename" -G "qpg" "python3 ./tangle/max_path_gurobi.py ./tangle/data/$filename $normalisation $time_limit"
 
 # MQLib solver
 printf "\n\n"
 echo "MQLib Solver"
-bsub -R "select[mem>""$memory"] rusage[mem="$memory"]  -M "$memory" -o "out/mqlib.$filename" -e "out/error.mqlib.$filename" -G "qpg" "MQLib/bin/MQLib -fQ ./out/mqlib_qubo_$filename.txt -h BURER2002 -r $time_limit -ps"
+bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/mqlib.$filename" -e "out/error.mqlib.$filename" -G "qpg" "MQLib/bin/MQLib -fQ ./out/mqlib_qubo_$filename.txt -h BURER2002 -r $time_limit -ps"
 
 # D-Wave solver
 printf "\n\n"
