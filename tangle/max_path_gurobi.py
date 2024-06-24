@@ -4,6 +4,7 @@ import numpy as np
 import sys
 import re
 import os
+from datetime import datetime
 from random import uniform
 from utils.qubo_utils import graph_to_max_path_digraph, max_path_problem_qubo_matrix
 from utils.graph_utils import graph_from_gfa_file, toy_graph, normalise_node_weights
@@ -46,7 +47,7 @@ if len(sys.argv) > 2:
 else:
     graph = normalise_node_weights(graph, 1)
     
-print(list(zip(list(graph.nodes), [graph.nodes[node]["weight"] for node in graph.nodes])))
+print(list(zip(list(graph.nodes), [graph.nodes[node]["normalised_weight"] for node in graph.nodes])))
     
 if len(sys.argv) > 3:
     try:
@@ -83,8 +84,19 @@ with gp.Env() as env, gp.Model(env=env) as model:
     model.Params.TimeLimit = time_limit
     model.optimize()
     
+    path = get_max_path_problem_path_from_gurobi(vars.X, dg)
     print(vars.X)
-    print(get_max_path_problem_path_from_gurobi(vars.X, dg))
+    print(path)
     print('Obj: %g' % model.ObjVal)
     print(f'Offset: {offset}')
     print(f'Best possible score: {-W - offset + 1}')
+    
+    save_dir = "out"
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
+        
+    now = datetime.now().strftime("%d%m%Y_%H%M")
+    save_file = save_dir + f"/qubo_path_gurobi_{now}"   
+        
+    to_save = np.array([vars.X, model.ObjVal + offset, path], dtype=object)
+    np.save(save_file, to_save)
