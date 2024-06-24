@@ -4,4 +4,4 @@
 [submodule "mqlib_fork"]
 	path = MQLib
 	url = https://github.com/JoshCudby/MQLib.git
-	branch = stable
+	branch = master
