@@ -4,18 +4,29 @@ from math import remainder
 from scipy.optimize import minimize
 
 
-def normalise_node_weights(graph: nx.Graph, normalisation: float):
+def normalise_node_weights(graph: nx.Graph, normalisation: float) -> nx.Graph:
+    """Normalises weights of nodes in a graph by a constant factor.
+
+    Args:
+        graph (nx.Graph): a node-weighted graph, with node attribute "weight".
+        normalisation (float): the constant factor to normalise weights by.
+
+    Returns:
+        nx.Graph: a graph with node attributes "normalised_weight".
+    """
     for node in graph.nodes:
         graph.nodes[node]["normalised_weight"] = round(graph.nodes[node]["weight"] / normalisation)
     return graph
 
 
 def _coverage_cost_function(x, digraph):
+    """Deprecated: attempt to programatically find normalisation"""
     print(x)
     return sum((remainder(digraph.nodes[node]["weight"], x)) ** 2 for node in digraph.nodes)
 
 
 def get_normalised_node_weights(graph: nx.Graph) -> tuple[nx.Graph, float]:
+    """Deprecated: attempt to programatically find normalisation"""
     total_node_weight = sum(graph.nodes[node]["weight"] for node in graph.nodes)
     average_node_weight = total_node_weight / len(graph.nodes)
     optimized_coverage = minimize(_coverage_cost_function, average_node_weight, graph, bounds=[(2, 1000)]).x[0]
@@ -24,7 +35,15 @@ def get_normalised_node_weights(graph: nx.Graph) -> tuple[nx.Graph, float]:
     return graph, optimized_coverage
 
 
-def digraph_from_gfa_file(filename) -> nx.DiGraph:
+def digraph_from_gfa_file(filename: str) -> nx.DiGraph:
+    """Reads a .gfa file into a directed graph.
+
+    Args:
+        filename (str): filepath to read.
+
+    Returns:
+        nx.DiGraph: corresponding directed graph.
+    """
     gfa = gfapy.Gfa.from_file(filename)
     digraph = nx.DiGraph()
     for segment_line in gfa.segments:
@@ -38,6 +57,14 @@ def digraph_from_gfa_file(filename) -> nx.DiGraph:
 
 
 def graph_from_gfa_file(filename: str) -> nx.Graph:
+    """Reads a .gfa file into a graph.
+
+    Args:
+        filename (str): filepath to read.
+
+    Returns:
+        nx.Graph: corresponding graph.
+    """
     gfa = gfapy.Gfa.from_file(filename)
     graph = nx.Graph()
     for segment_line in gfa.segments:
@@ -49,7 +76,16 @@ def graph_from_gfa_file(filename: str) -> nx.Graph:
     return graph
 
 
-def toy_graph(exact_solution=True):
+def toy_graph(exact_solution=True) -> nx.DiGraph:
+    """Returns a small fixed graph instance.
+    Weights are chosen so that all weights can be satisfied if and only if exact_solution=True.
+
+    Args:
+        exact_solution (bool, optional): _description_. Defaults to True.
+
+    Returns:
+        _type_: _description_
+    """
     weight_1 = 3 if exact_solution else 4
         
     g = nx.DiGraph()
@@ -67,6 +103,7 @@ def toy_graph(exact_solution=True):
         
 
 def setup_graph_for_tangle_qubo(graph, t_max):
+    """Deprecated"""
     graph_copy = nx.DiGraph(graph)
     # Add virtual node to allow early finishes
     graph_copy.add_nodes_from(
@@ -80,7 +117,19 @@ def setup_graph_for_tangle_qubo(graph, t_max):
     return graph_copy
 
 
-def graph_to_max_path_digraph(graph: nx.Graph):
+def graph_to_max_path_digraph(graph: nx.Graph) -> nx.DiGraph:
+    """Converts a (normalised) node-weighted graph to a corresponding directed graph with extra nodes.
+    
+    Nodes with weight > 1 are split into multiple nodes.
+    A new "end" node is added.
+    Suitable edges are added so that a max path on the new graph corresponds to a max path on the original graph.
+
+    Args:
+        graph (nx.Graph): a node-weighted graph.
+
+    Returns:
+        nx.DiGraph: an unweighted, directed graph.
+    """
     dg = nx.DiGraph()
     for node in graph.nodes:
         weight = graph.nodes[node]["normalised_weight"]

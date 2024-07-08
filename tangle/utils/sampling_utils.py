@@ -3,10 +3,12 @@ import networkx as nx
 from math import floor
 
 def get_path(sample: dict):
+    """Deprecated"""
     return sorted([i for i in list(sample.keys()) if sample[i]], key=lambda e: e[1])
 
 
 def get_node_visits(sample: dict):
+    """Deprecated"""
     path = get_path(sample)
     nodes = set([key[0] for key in list(sample.keys())])
     node_visits = {node : 0 for node in nodes}
@@ -17,18 +19,37 @@ def get_node_visits(sample: dict):
 
 
 def get_constraint_values(sample: dict, graph: nx.DiGraph):
+    """Deprecated"""
     node_visits = get_node_visits(sample)
     constraint_values = np.array([node_visits[x] - graph.nodes.data()[x]["weight"] for x in list(graph.nodes)])
     return constraint_values
 
 
-def _index_to_node_time(idx, nodes):
-    rem = idx % nodes
-    div = floor(idx / nodes)
+def _index_to_node_time(idx, num_nodes):
+    """Converts a qubo index to a (time-step, node_index) pair
+
+    Args:
+        idx (int): index of qubo variable
+        num_nodes (int): number of nodes in graph
+
+    Returns:
+        (int, int): A pair describing the corresponding path time-step and the node index
+    """
+    rem = idx % num_nodes
+    div = floor(idx / num_nodes)
     return (div, rem)
 
 
-def get_max_path_problem_path_from_sample(sample: dict, dg: nx.DiGraph) -> list:
+def dwave_sample_to_path(sample: dict, dg: nx.DiGraph) -> list:
+    """Gets the actual path as a list of (time, node) pairs from an output of a DWave Sampler.
+
+    Args:
+        sample (dict): the qubo variables as a dict.
+        dg (nx.DiGraph): the directed graph underlying the problem.
+
+    Returns:
+        list: a list of (time_step, node) pairs.
+    """
     on_vars = []
     for i in range(len(sample.keys())):
         if sample[i] == 1:
@@ -39,6 +60,15 @@ def get_max_path_problem_path_from_sample(sample: dict, dg: nx.DiGraph) -> list:
 
 
 def qubo_vars_to_path(qubo_vars: list[int], dg: nx.DiGraph) -> list:
+    """Gets the actual path as a list of (time, node) pairs from an array of qubo variable values.
+
+    Args:
+        qubo_vars (list[int]): the qubo variables as a list.
+        dg (nx.DiGraph): the directed graph underlying the problem.
+
+    Returns:
+        list: a list of (time_step, node) pairs.
+    """
     on_vars = []
     for i, var in enumerate(qubo_vars):
         if var == 1:

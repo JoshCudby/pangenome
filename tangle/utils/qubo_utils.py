@@ -5,10 +5,20 @@ from dimod.reference.samplers import SimulatedAnnealingSampler
 from dimod import Sampler, BQM
 from dwave.system import LeapHybridSampler
 from utils.graph_utils import setup_graph_for_tangle_qubo, graph_to_max_path_digraph
-from utils.sampling_utils import get_constraint_values, get_path, get_max_path_problem_path_from_sample
+from utils.sampling_utils import get_constraint_values, get_path, dwave_sample_to_path
 
 
-def max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty) -> np.ndarray:
+def max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty: int) -> np.ndarray:
+    """Generates a matrix describing the max path problem qubo cost function.
+    The cost function is C(x) = x^T Q x, where Q is the matrix returned by this function.
+
+    Args:
+        graph (nx.DiGraph): the directed graph describing the max path problem.
+        penalty (int): the penalty for breaking constraints.
+
+    Returns:
+        np.ndarray: a 2D array Q representing the cost function.
+    """
     nodes = list(graph.nodes)
     end_node = nodes[-1]
     W = len(nodes) - 1
@@ -211,5 +221,5 @@ def max_path_problem(graph: nx.Graph, sampler=None, penalty=None):
     
     best_sample, best_energy = _sample_bqm(sampler, bqm, label="Max Path QUBO")
     
-    best_path = get_max_path_problem_path_from_sample(best_sample, dg)
+    best_path = dwave_sample_to_path(best_sample, dg)
     return best_sample, best_energy, best_path
