@@ -38,11 +38,11 @@ def get_max_path_problem_path_from_sample(sample: dict, dg: nx.DiGraph) -> list:
     return path
 
 
-def get_max_path_problem_path_from_gurobi(vars, dg: nx.DiGraph) -> list:
+def qubo_vars_to_path(qubo_vars: list[int], dg: nx.DiGraph) -> list:
     on_vars = []
-    for i, var in enumerate(vars):
+    for i, var in enumerate(qubo_vars):
         if var == 1:
             on_vars.append(i)
-    path = [_index_to_node_time(x, len(dg.nodes)) for x in on_vars]
+    path = [_index_to_node_time(i, len(dg.nodes)) for i in on_vars]
     path = [(e[0], list(dg.nodes)[e[1]]) for e in path]
     return path

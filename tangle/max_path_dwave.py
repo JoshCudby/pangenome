@@ -101,7 +101,7 @@ if __name__ == "__main__":
         os.mkdir(save_dir)
         
     now = datetime.now().strftime("%d%m%Y_%H%M")
-    save_file = save_dir + f"/qubo_path_{solver}_{now}"   
+    save_file = save_dir + f"/qubo_dwave_{solver}_{now}"   
         
     to_save = np.array([sample, energy, path], dtype=object)
     np.save(save_file, to_save)

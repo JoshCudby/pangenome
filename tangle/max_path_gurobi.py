@@ -8,7 +8,7 @@ from datetime import datetime
 from random import uniform
 from utils.qubo_utils import graph_to_max_path_digraph, max_path_problem_qubo_matrix
 from utils.graph_utils import graph_from_gfa_file, toy_graph, normalise_node_weights
-from utils.sampling_utils import get_max_path_problem_path_from_gurobi
+from utils.sampling_utils import qubo_vars_to_path
 
 
 if len(sys.argv) > 1:
@@ -37,16 +37,15 @@ else:
     graph = toy_graph(exact_solution=True)
 
 if len(sys.argv) > 2:
-    print('Trying to normalise')
     try:
         normalisation = int(sys.argv[2])
-        print(f'Normalising by {normalisation}')
-        graph = normalise_node_weights(graph, normalisation)
     except ValueError:
-        graph = normalise_node_weights(graph, 1)
+        normalisation = 1
 else:
-    graph = normalise_node_weights(graph, 1)
+    normalisation = 1
     
+print(f'Normalising by {normalisation}')
+graph = normalise_node_weights(graph, normalisation)
 print(list(zip(list(graph.nodes), [graph.nodes[node]["normalised_weight"] for node in graph.nodes])))
     
 if len(sys.argv) > 3:
@@ -66,7 +65,7 @@ qubo_matrix = max_path_problem_qubo_matrix(dg, penalty)
 # Write to MQLib Format
 non_zero = np.nonzero(qubo_matrix)
 non_zero_count = int(non_zero[0].shape[0] / 2 + qubo_matrix.shape[0] / 2)
-f = open(f'out/mqlib_qubo_{os.path.basename(filename)}.txt', 'w')
+f = open(f'out/mqlib_input_{os.path.basename(filename)}.txt', 'w')
 f.write(f'{qubo_matrix.shape[0]} {non_zero_count}\n')
 for i in range(qubo_matrix.shape[0]):
     for j in range(i, qubo_matrix.shape[0]):
@@ -76,16 +75,16 @@ for i in range(qubo_matrix.shape[0]):
 offset = penalty * (W + 3)
 
 with gp.Env() as env, gp.Model(env=env) as model:
-    vars = model.addMVar(shape=qubo_matrix.shape[0], vtype=GRB.BINARY, name="x")
-    model.setObjective(vars @ qubo_matrix @ vars, GRB.MINIMIZE)
+    model_vars = model.addMVar(shape=qubo_matrix.shape[0], vtype=GRB.BINARY, name="x")
+    model.setObjective(model_vars @ qubo_matrix @ model_vars, GRB.MINIMIZE)
     model.Params.BestObjStop = -W - offset + 1
     model.Params.MIPFocus = 1
     model.Params.ImproveStartTime = 1200
     model.Params.TimeLimit = time_limit
     model.optimize()
     
-    path = get_max_path_problem_path_from_gurobi(vars.X, dg)
-    print(vars.X)
+    path = qubo_vars_to_path(model_vars.X, dg)
+    print(model_vars.X)
     print(path)
     print('Obj: %g' % model.ObjVal)
     print(f'Offset: {offset}')
@@ -96,7 +95,7 @@ with gp.Env() as env, gp.Model(env=env) as model:
         os.mkdir(save_dir)
         
     now = datetime.now().strftime("%d%m%Y_%H%M")
-    save_file = save_dir + f"/qubo_path_gurobi_{now}"   
+    save_file = save_dir + f"/qubo_gurobi_{now}"   
         
-    to_save = np.array([vars.X, model.ObjVal + offset, path], dtype=object)
+    to_save = np.array([model_vars.X, model.ObjVal + offset, path], dtype=object)
     np.save(save_file, to_save)

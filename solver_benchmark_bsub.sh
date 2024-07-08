@@ -52,7 +52,7 @@ case $time_limit in
     *      ) echo "Time limit was not a number."; exit 1
 esac
 
-case $time_limit in
+case $memory in
     [0-9]* ) echo "Memory:" $memory
              ;;
     *      ) echo "Memory was not a number."; exit 1
@@ -68,7 +68,7 @@ bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/gu
 # MQLib solver
 printf "\n\n"
 echo "MQLib Solver"
-bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/mqlib.$filename" -e "out/error.mqlib.$filename" -G "qpg" "MQLib/bin/MQLib -fQ ./out/mqlib_qubo_$filename.txt -h BURER2002 -r $time_limit -ps"
+bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/mqlib.$filename" -e "out/error.mqlib.$filename" -G "qpg" "python3 ./tangle/max_path_mqlib.py $filename $normalisation $time_limit"
 
 # D-Wave solver
 printf "\n\n"
