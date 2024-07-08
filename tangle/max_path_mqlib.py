@@ -30,11 +30,9 @@ if len(sys.argv) > 3:
 else:
     time_limit = 60
 
-graph = graph_from_gfa_file(f"./tangle/data/{filename}")
+graph = graph_from_gfa_file(f"./data/{filename}")
 graph = normalise_node_weights(graph, normalisation)
 dg = graph_to_max_path_digraph(graph)
-print(list(dg.nodes))
-
 
 process = subprocess.run(["MQLib/bin/MQLib", "-fQ", f"./out/mqlib_input_{filename}.txt", "-h", "BURER2002", "-r", f"{time_limit}", "-ps"], capture_output=True)
 out = process.stdout

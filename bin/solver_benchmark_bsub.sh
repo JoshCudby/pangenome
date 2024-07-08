@@ -33,7 +33,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-if [ -f "./tangle/data/"$filename ]; then
+if [ -f "./data/"$filename ]; then
     echo "Reading file:" $filename
 else
     echo "Could not find input file."
@@ -63,7 +63,7 @@ esac
 # Gurobi solver
 printf "\n\n"
 echo "Gurobi Solver"
-bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/gurobi.$filename" -e "out/error.gurobi.$filename" -G "qpg" "python3 ./tangle/max_path_gurobi.py ./tangle/data/$filename $normalisation $time_limit"
+bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/gurobi.$filename" -e "out/error.gurobi.$filename" -G "qpg" "python3 ./tangle/max_path_gurobi.py ./data/$filename $normalisation $time_limit"
 
 # MQLib solver
 printf "\n\n"
@@ -73,6 +73,6 @@ bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/mq
 # D-Wave solver
 printf "\n\n"
 echo "D-Wave Solver"
-bsub -R "select[mem>1000] rusage[mem=1000]"  -M "1000" -o "out/dwave.$filename" -e "out/error.dwave.$filename" -G "qpg" "python3 ./tangle/max_path_qubo.py ./tangle/data/$filename $normalisation q"
+bsub -R "select[mem>1000] rusage[mem=1000]"  -M "1000" -o "out/dwave.$filename" -e "out/error.dwave.$filename" -G "qpg" "python3 ./tangle/max_path_qubo.py ./data/$filename $normalisation q"
 
 exit 0

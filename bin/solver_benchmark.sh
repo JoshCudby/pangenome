@@ -25,7 +25,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-if [ -f "./tangle/data/"$filename ]; then
+if [ -f "./data/"$filename ]; then
     echo "Reading file:"; echo $filename
 else
     echo "Could not find input file."
@@ -41,7 +41,7 @@ esac
 # Gurobi solver
 printf "\n\n"
 echo "Gurobi Solver"
-python3 "./tangle/max_path_gurobi.py" "./tangle/data/"$filename $normalisation $time_limit
+python3 "./tangle/max_path_gurobi.py" "./data/"$filename $normalisation $time_limit
 
 # MQLib solver
 printf "\n\n"
@@ -51,6 +51,6 @@ python3 "./tangle/max_path_mqlib.py" $filename $normalisation $time_limit
 # D-Wave solver
 printf "\n\n"
 echo "D-Wave Solver"
-python3 "./tangle/max_path_dwave.py" "./tangle/data/"$filename $normalisation q
+python3 "./tangle/max_path_dwave.py" "./data/"$filename $normalisation q
 
 exit 0
