@@ -1,6 +1,32 @@
 import numpy as np
 import networkx as nx
 from math import floor
+from dimod.reference.samplers import SimulatedAnnealingSampler
+from dimod import Sampler, BQM
+from dwave.system import LeapHybridSampler
+
+
+def dwave_sample_bqm(sampler: Sampler, bqm: BQM, num_reads=30, label="QUBO"):
+    """Perform a batch of annealing on a given Binary Quadratic Model.
+
+    Args:
+        sampler (Sampler): The sampler to anneal with.
+        bqm (BQM): The model to anneal.
+        num_reads (int, optional): Number of runs in batch. Defaults to 30.
+
+    Returns:
+        (dict, float): Returns the best sample and best energy of the batch.
+    """
+    if isinstance(sampler, LeapHybridSampler):
+        sampleset = sampler.sample(bqm, label=label)
+    elif isinstance(sampler, SimulatedAnnealingSampler):
+        sampleset = sampler.sample(bqm, num_reads=num_reads)
+    else:
+        raise Exception("Unknown Sampler type")
+    best_sample = sampleset.first.sample
+    best_energy = sampleset.first.energy
+    return best_sample, best_energy
+
 
 def get_path(sample: dict):
     """Deprecated"""

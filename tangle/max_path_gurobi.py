@@ -6,14 +6,14 @@ import re
 import os
 from datetime import datetime
 from random import uniform
-from utils.qubo_utils import graph_to_max_path_digraph, max_path_problem_qubo_matrix
+from utils.qubo_utils import graph_to_max_path_digraph, get_max_path_problem_qubo_matrix
 from utils.graph_utils import graph_from_gfa_file, toy_graph, normalise_node_weights
 from utils.sampling_utils import qubo_vars_to_path
 
 
 if len(sys.argv) > 1:
     filename = sys.argv[1]
-    graph = graph_from_gfa_file(filename)
+    graph = graph_from_gfa_file(f"data/{filename}")
 
     try:
         for node in graph.nodes:
@@ -60,17 +60,7 @@ dg = graph_to_max_path_digraph(graph)
 W = len(dg.nodes) - 1
 penalty = W
 
-qubo_matrix = max_path_problem_qubo_matrix(dg, penalty)
-
-# Write to MQLib Format
-non_zero = np.nonzero(qubo_matrix)
-non_zero_count = int(non_zero[0].shape[0] / 2 + qubo_matrix.shape[0] / 2)
-f = open(f'out/mqlib_input_{os.path.basename(filename)}.txt', 'w')
-f.write(f'{qubo_matrix.shape[0]} {non_zero_count}\n')
-for i in range(qubo_matrix.shape[0]):
-    for j in range(i, qubo_matrix.shape[0]):
-        if not qubo_matrix[i, j] == 0: 
-            f.write(f'{i + 1} {j + 1} {-qubo_matrix[i, j]}\n')
+qubo_matrix = get_max_path_problem_qubo_matrix(dg, penalty)
     
 offset = penalty * (W + 3)
 

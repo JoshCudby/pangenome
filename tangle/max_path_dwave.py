@@ -6,13 +6,13 @@ from datetime import datetime
 from random import uniform
 from dwave.system import LeapHybridSampler
 from dimod.reference import SimulatedAnnealingSampler
-from utils.qubo_utils import max_path_problem
+from utils.qubo_utils import dwave_sample_max_path_problem
 from utils.graph_utils import graph_from_gfa_file, toy_graph, normalise_node_weights
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         filename = sys.argv[1]
-        graph = graph_from_gfa_file(filename)
+        graph = graph_from_gfa_file(f"data/{filename}")
         
         # # Real weight assignment
         # for node in graph.nodes:
@@ -69,13 +69,13 @@ if __name__ == "__main__":
         print('Trying to normalise')
         try:
             normalisation = int(sys.argv[2])
-            print(f'Normalising by {normalisation}')
-            graph = normalise_node_weights(graph, normalisation)
         except ValueError:
-            graph = normalise_node_weights(graph, 1)
+            normalisation = 1
     else:
-        graph = normalise_node_weights(graph, 1)
+        normalisation = 1
         
+    print(f'Normalising by {normalisation}')
+    graph = normalise_node_weights(graph, normalisation)
     print(list(zip(list(graph.nodes), [graph.nodes[node]["normalised_weight"] for node in graph.nodes])))
     
     if len(sys.argv) > 3 and sys.argv[3] == 'q':
@@ -87,7 +87,7 @@ if __name__ == "__main__":
         sampler = SimulatedAnnealingSampler()
         print("Using Classical Solver")    
    
-    sample, energy, path = max_path_problem(graph, sampler)
+    sample, energy, path = dwave_sample_max_path_problem(graph, sampler)
     print(f"Best path: {path}")
     print(f"Energy of path: {energy}")
     for i in range(len(path) - 1):

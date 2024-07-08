@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 from utils.sampling_utils import qubo_vars_to_path
 from utils.graph_utils import graph_from_gfa_file, normalise_node_weights
-from utils.qubo_utils import graph_to_max_path_digraph
+from utils.qubo_utils import get_max_path_problem_qubo_matrix, graph_to_max_path_digraph
 
 
 if len(sys.argv) > 1:
@@ -29,20 +29,39 @@ if len(sys.argv) > 3:
         time_limit = 60
 else:
     time_limit = 60
+    
+filepath = f'out/mqlib_input_{filename}.txt'
+print(f'MQLIB file name: {filepath}')
 
-graph = graph_from_gfa_file(f"./data/{filename}")
+graph = graph_from_gfa_file(f"data/{filename}")
 graph = normalise_node_weights(graph, normalisation)
 dg = graph_to_max_path_digraph(graph)
+W = len(dg.nodes) - 1
+penalty = W
+offset = W * (W + 3)
 
-process = subprocess.run(["MQLib/bin/MQLib", "-fQ", f"./out/mqlib_input_{filename}.txt", "-h", "BURER2002", "-r", f"{time_limit}", "-ps"], capture_output=True)
-out = process.stdout
-out_str = out.decode("utf-8")
-out_data = [x for x in out_str.split('\n') if len(x) > 0]
+qubo_matrix = get_max_path_problem_qubo_matrix(dg, penalty)
+
+# Write to MQLib Format
+non_zero = np.nonzero(qubo_matrix)
+non_zero_count = int(non_zero[0].shape[0] / 2 + qubo_matrix.shape[0] / 2)
+f = open(filepath, 'w')
+f.write(f'{qubo_matrix.shape[0]} {non_zero_count}\n')
+for i in range(qubo_matrix.shape[0]):
+    for j in range(i, qubo_matrix.shape[0]):
+        if not qubo_matrix[i, j] == 0: 
+            f.write(f'{i + 1} {j + 1} {-qubo_matrix[i, j]}\n')
+f.close()
+            
+
+# Run the MQLib solver and capture output
+process = subprocess.run(["MQLib/bin/MQLib", "-fQ", filepath, "-h", "BURER2002", "-r", str(time_limit), "-ps"], capture_output=True)
+out = process.stdout.decode("utf-8")
+
+# First line of output includes run data. 3rd line contains the solution.
+out_data = [x for x in out.split('\n') if len(x) > 0]
 solution = out_data[2].split()
 solution = [int(x) for x in solution]
-
-W = len(dg.nodes) - 1
-offset = W * (W + 3)
 energy = int(out_data[0].split(',')[3])
 
 path = qubo_vars_to_path(solution, dg)
