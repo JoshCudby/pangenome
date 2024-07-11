@@ -19,7 +19,7 @@ while [ "$1" != "" ]; do
                                   normalisation="$1"
                                   ;;
         -qt | --quantum-time )    shift
-                                  qunatum_time_limit="$1"
+                                  quantum_time_limit="$1"
                                   ;;
         -m | --memory )           shift
                                   memory="$1"
@@ -50,6 +50,14 @@ case $memory in
     [0-9]* ) echo "Memory:" $memory
              ;;
     *      ) echo "Memory was not a number."; exit 1
+esac
+
+case $quantum_time_limit in
+    -1     ) echo "Default quantum time limit"
+             ;;
+    [0-9]* ) echo "Quantum time limit:" $quantum_time_limit
+             ;;
+    *      ) echo "Quantum time limit was not a number."; exit 1
 esac
 
 ## MAIN
