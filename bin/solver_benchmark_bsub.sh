@@ -63,16 +63,16 @@ esac
 # Gurobi solver
 printf "\n\n"
 echo "Gurobi Solver"
-bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/gurobi.$filename" -e "out/error.gurobi.$filename" -G "qpg" "python3 ./tangle/max_path_gurobi.py $filename $normalisation $time_limit"
+bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/gurobi.$filename.%J" -e "out/error.gurobi.$filename.%J" -G "qpg" "python3 ./tangle/max_path_gurobi.py $filename $normalisation $time_limit"
 
 # MQLib solver
 printf "\n\n"
 echo "MQLib Solver"
-bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/mqlib.$filename" -e "out/error.mqlib.$filename" -G "qpg" "python3 ./tangle/max_path_mqlib.py $filename $normalisation $time_limit"
+bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/mqlib.$filename.%J" -e "out/error.mqlib.$filename.%J" -G "qpg" "python3 ./tangle/max_path_mqlib.py $filename $normalisation $time_limit"
 
 # D-Wave solver
 printf "\n\n"
 echo "D-Wave Solver"
-bsub -R "select[mem>1000] rusage[mem=1000]"  -M "1000" -o "out/dwave.$filename" -e "out/error.dwave.$filename" -G "qpg" "python3 ./tangle/max_path_qubo.py $filename $normalisation q"
+bsub -R "select[mem>1000] rusage[mem=1000]"  -M "1000" -o "out/dwave.$filename.%J" -e "out/error.dwave.$filename.%J" -G "qpg" "python3 ./tangle/max_path_qubo.py $filename $normalisation q"
 
 exit 0
