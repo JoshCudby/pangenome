@@ -65,6 +65,14 @@ solution = [int(x) for x in solution]
 energy = int(out_data[0].split(',')[3])
 
 path = qubo_vars_to_path(solution, dg)
+print(path)
+print(f"Energy of path: {energy}")
+for i in range(len(path) - 1):
+    v1 = path[i][1][0:-2]
+    v2 = path[i + 1][1][0:-2]
+    if not (v1, v2) in graph.edges and not path[i + 1][1] == 'end':
+        print(f'Broke graph edge at step {i}')
+
 save_dir = "out"
 if not os.path.exists(save_dir):
     os.mkdir(save_dir)

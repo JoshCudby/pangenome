@@ -2,7 +2,7 @@
 
 usage()
 {
-    echo "usage: solver_benchmark [[[-f file ] [-n normalisation] [-t time limit] [-m memory]] | [-h]]"
+    echo "usage: solver_benchmark_bsub [[[-f file ] [-n normalisation] [-t time limit] [-m memory]] | [-h]]"
 }
 
 # Defaults
@@ -73,6 +73,6 @@ bsub -R '"select[mem>'$memory'] rusage[mem='$memory']"'  -M "$memory" -o "out/mq
 # D-Wave solver
 printf "\n\n"
 echo "D-Wave Solver"
-bsub -R "select[mem>1000] rusage[mem=1000]"  -M "1000" -o "out/dwave.$filename.%J" -e "out/error.dwave.$filename.%J" -G "qpg" "python3 ./tangle/max_path_qubo.py $filename $normalisation q"
+bsub -R "select[mem>1000] rusage[mem=1000]"  -M "1000" -o "out/dwave.$filename.%J" -e "out/error.dwave.$filename.%J" -G "qpg" "python3 ./tangle/max_path_dwave.py $filename $normalisation q"
 
 exit 0

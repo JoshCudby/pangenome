@@ -76,7 +76,7 @@ def graph_from_gfa_file(filename: str) -> nx.Graph:
     return graph
 
 
-def toy_graph(exact_solution=True) -> nx.DiGraph:
+def toy_graph(exact_solution=True) -> nx.Graph:
     """Returns a small fixed graph instance.
     Weights are chosen so that all weights can be satisfied if and only if exact_solution=True.
 
@@ -88,16 +88,16 @@ def toy_graph(exact_solution=True) -> nx.DiGraph:
     """
     weight_1 = 3 if exact_solution else 4
         
-    g = nx.DiGraph()
+    g = nx.Graph()
     g.add_nodes_from([
-        (0, {"weight": 1}),
-        (1, {"weight": weight_1}),
-        (2, {"weight": 1}),
-        (3, {"weight": 1}),
-        (4, {"weight": 1}),
+        ('0', {"weight": 1, "start": "start"}),
+        ('1', {"weight": weight_1}),
+        ('2', {"weight": 1}),
+        ('3', {"weight": 1}),
+        ('4', {"weight": 1, "start": "end"}),
     ])
     g.add_edges_from([
-        (0, 1), (1, 2), (1, 3), (1, 4), (2, 1), (2, 3), (2, 4), (3, 1), (3, 2), (3, 4),
+        ('0', '1'), ('1', '2'), ('1', '3'), ('1', '4'), ('2', '3'), ('2', '4'), ('3', '4'),
     ])
     return g
         
@@ -162,9 +162,7 @@ def graph_to_max_path_digraph(graph: nx.Graph) -> nx.DiGraph:
                     dg.add_edge(f'{node}_{i}', 'end')
                     dg.nodes[f'{node}_{i}']["start"] = "end"
             elif graph.nodes[node]["start"] == "start":
-                weight = graph.nodes[node]["normalised_weight"]
-                for i in range(weight):
-                    dg.nodes[f'{node}_{i}']["start"] = "start"
+                dg.nodes[f'{node}_{0}']["start"] = "start"
         except:
             pass
     

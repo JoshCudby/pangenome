@@ -51,6 +51,6 @@ python3 "./tangle/max_path_mqlib.py" $filename $normalisation $time_limit
 # D-Wave solver
 printf "\n\n"
 echo "D-Wave Solver"
-python3 "./tangle/max_path_dwave.py" $filename $normalisation c
+python3 "./tangle/max_path_dwave.py" $filename $normalisation q
 
 exit 0

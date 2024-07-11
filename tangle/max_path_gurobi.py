@@ -74,11 +74,17 @@ with gp.Env() as env, gp.Model(env=env) as model:
     model.optimize()
     
     path = qubo_vars_to_path(model_vars.X, dg)
-    print(model_vars.X)
     print(path)
     print('Obj: %g' % model.ObjVal)
     print(f'Offset: {offset}')
     print(f'Best possible score: {-W - offset + 1}')
+    
+    print(f"Energy of path: {model.ObjVal + offset}")
+    for i in range(len(path) - 1):
+        v1 = path[i][1][0:-2]
+        v2 = path[i + 1][1][0:-2]
+        if not (v1, v2) in graph.edges and not path[i + 1][1] == 'end':
+            print(f'Broke graph edge at step {i}')
     
     save_dir = "out"
     if not os.path.exists(save_dir):
