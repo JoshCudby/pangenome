@@ -123,24 +123,57 @@ def print_path(path: list):
         
         
 def validate_path(path: list, graph: nx.Graph):
+    """Checks the constraints for a path on a graph.
+    
+    In particular:
+     - does the path go along graph edges at each time step
+     - is each node visited the correct number of times
+     - is exactly one node visited per time step
+
+    Args:
+        path (list): _description_
+        graph (nx.Graph): _description_
+    """
     node_dict = {node: 0 for node in graph.nodes}
+    node_dict['end'] = 0
     
     for i in range(len(path) - 1):
         v1 = path[i][1][0:-2]
         node_dict[v1] += 1
         v2 = path[i + 1][1][0:-2]
-        if not (v1, v2) in graph.edges and not path[i + 1][1] == 'end':
-            print(f'Broke graph edge at step {i}')
+        if not (v1, v2) in graph.edges:
+            if v1 =='end' and v2 == 'end':
+                pass
+            else:
+                try:
+                    start_value = graph.nodes[v1]["start"]
+                    if not start_value == 'end' and v2 == 'end':
+                        print(f'Broke graph edge at step {i}')
+                except KeyError:
+                    print(f'Broke graph edge at step {i}')
     
     for node in graph.nodes:
-        missing_visits = graph.nodes[node]["weight"] - node_dict[node]
+        missing_visits = graph.nodes[node]["normalised_weight"] - node_dict[node]
         if  missing_visits != 0:
             print(f'Did not meet node weight for node: {node}. Missing visits: {missing_visits}')
     
     time_offset = 0
     for i in range(len(path)):
-        if not(i == path[i][0] + time_offset):
-            print(f'Skipped time {i}')
+        if i < path[i][0] + time_offset:
+            print('Skipped time {i}')
             time_offset -= 1
+        elif i > path[i][0] + time_offset:
+            print('Visited 2 nodes at time {i}')
+            
+    for node in graph.nodes:
+        try:
+            if graph.nodes[node]["start"] == "start":
+                if not path[0][1][0:-2] == node:
+                    print(f'Did not start at Start node: {node}')
+        except:
+            pass
+    
+    if not path[-1][1] == 'end_0':
+        print('Did not end at End node.')
             
     

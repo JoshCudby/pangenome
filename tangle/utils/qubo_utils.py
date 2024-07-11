@@ -31,7 +31,7 @@ def get_max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty: int) -> np.ndar
             else:
                 qubo_matrix[t, i, t+1, j] += -1 if (nodes[i] != end_node and nodes[j] != end_node) else 0
     
-    # Penalise multiple locations at one time
+    # Penalise not being in exactly 1 location at each time
     for t in range(W+1):
         for i in range(W+1):
             qubo_matrix[t, i, t, i] -= penalty
@@ -51,6 +51,7 @@ def get_max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty: int) -> np.ndar
                 qubo_matrix[0, i, 0, i] -= penalty
         except:
             pass
+        
     # Reward ending at the end
     qubo_matrix[W, W, W, W] -= penalty
     

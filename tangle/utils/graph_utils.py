@@ -153,19 +153,19 @@ def graph_to_max_path_digraph(graph: nx.Graph) -> nx.DiGraph:
                     f'{edge[0]}_{i}', f'{edge[0]}_{i + 1}'
                 )
         
-    dg.add_node('end')
+    dg.add_node('end_0')
     for node in graph.nodes:
         try:
             if graph.nodes[node]["start"] == "end":
                 weight = graph.nodes[node]["normalised_weight"]
                 for i in range(weight):
-                    dg.add_edge(f'{node}_{i}', 'end')
+                    dg.add_edge(f'{node}_{i}', 'end_0')
                     dg.nodes[f'{node}_{i}']["start"] = "end"
             elif graph.nodes[node]["start"] == "start":
                 dg.nodes[f'{node}_{0}']["start"] = "start"
         except:
             pass
     
-    dg.add_edge('end', 'end')        
+    dg.add_edge('end_0', 'end_0')        
     
     return dg

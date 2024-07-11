@@ -32,10 +32,12 @@ else:
     time_limit = 60
     
 filepath = f'out/mqlib_input_{filename}.txt'
-print(f'MQLIB file name: {filepath}')
 
 graph = graph_from_gfa_file(f"data/{filename}")
+
+print(f'Normalising by: {normalisation}')
 graph = normalise_node_weights(graph, normalisation)
+
 dg = graph_to_max_path_digraph(graph)
 W = len(dg.nodes) - 1
 penalty = W
@@ -64,7 +66,6 @@ out_data = [x for x in out.split('\n') if len(x) > 0]
 solution = out_data[2].split()
 solution = [int(x) for x in solution]
 solution_energy = int(out_data[0].split(',')[3])
-offset = penalty * (W + 3)
 energy = offset - solution_energy
 
 path = qubo_vars_to_path(solution, dg)
