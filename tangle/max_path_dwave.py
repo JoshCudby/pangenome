@@ -8,7 +8,7 @@ from dwave.system import LeapHybridSampler
 from dimod.reference import SimulatedAnnealingSampler
 from utils.qubo_utils import dwave_sample_max_path_problem
 from utils.graph_utils import graph_from_gfa_file, toy_graph, normalise_node_weights
-from utils.sampling_utils import print_path
+from utils.sampling_utils import print_path, validate_path
 
 if len(sys.argv) > 1:
     filename = sys.argv[1]
@@ -66,7 +66,6 @@ else:
     graph = toy_graph(exact_solution=False)
 
 if len(sys.argv) > 2:
-    print('Trying to normalise')
     try:
         normalisation = int(sys.argv[2])
     except ValueError:
@@ -102,11 +101,7 @@ sample, energy, path = dwave_sample_max_path_problem(graph, sampler, time_limit=
 print(f"Best path:")
 print_path(path)
 print(f"Energy of path: {energy}")
-for i in range(len(path) - 1):
-    v1 = path[i][1][0:-2]
-    v2 = path[i + 1][1][0:-2]
-    if not (v1, v2) in graph.edges and not path[i + 1][1] == 'end':
-        print(f'Broke graph edge at step {i}')
+validate_path(path, graph)
 
 save_dir = "out"
 if not os.path.exists(save_dir):
