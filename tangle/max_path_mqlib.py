@@ -7,6 +7,7 @@ from datetime import datetime
 from utils.sampling_utils import qubo_vars_to_path
 from utils.graph_utils import graph_from_gfa_file, normalise_node_weights
 from utils.qubo_utils import get_max_path_problem_qubo_matrix, graph_to_max_path_digraph
+from utils.sampling_utils import print_path
 
 
 if len(sys.argv) > 1:
@@ -67,7 +68,8 @@ offset = penalty * (W + 3)
 energy = offset - solution_energy
 
 path = qubo_vars_to_path(solution, dg)
-print(path)
+print(f"Best path:")
+print_path(path)
 print(f"Energy of path: {energy}")
 for i in range(len(path) - 1):
     v1 = path[i][1][0:-2]

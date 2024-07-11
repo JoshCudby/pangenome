@@ -8,6 +8,7 @@ from dwave.system import LeapHybridSampler
 from dimod.reference import SimulatedAnnealingSampler
 from utils.qubo_utils import dwave_sample_max_path_problem
 from utils.graph_utils import graph_from_gfa_file, toy_graph, normalise_node_weights
+from utils.sampling_utils import print_path
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -88,7 +89,8 @@ if __name__ == "__main__":
         print("Using Classical Solver")    
    
     sample, energy, path = dwave_sample_max_path_problem(graph, sampler)
-    print(f"Best path: {path}")
+    print(f"Best path:")
+    print_path(path)
     print(f"Energy of path: {energy}")
     for i in range(len(path) - 1):
         v1 = path[i][1][0:-2]

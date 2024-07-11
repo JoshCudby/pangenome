@@ -9,6 +9,7 @@ from random import uniform
 from utils.qubo_utils import graph_to_max_path_digraph, get_max_path_problem_qubo_matrix
 from utils.graph_utils import graph_from_gfa_file, toy_graph, normalise_node_weights
 from utils.sampling_utils import qubo_vars_to_path
+from utils.sampling_utils import print_path
 
 
 if len(sys.argv) > 1:
@@ -74,12 +75,13 @@ with gp.Env() as env, gp.Model(env=env) as model:
     model.optimize()
     
     path = qubo_vars_to_path(model_vars.X, dg)
-    print(path)
-    print('Obj: %g' % model.ObjVal)
+    print(f"Best path:")
+    print_path(path)
+    print(f"Energy of path: {model.ObjVal + offset}")
+    print('Objective value: %g' % model.ObjVal)
     print(f'Offset: {offset}')
     print(f'Best possible score: {-W - offset + 1}')
     
-    print(f"Energy of path: {model.ObjVal + offset}")
     for i in range(len(path) - 1):
         v1 = path[i][1][0:-2]
         v2 = path[i + 1][1][0:-2]

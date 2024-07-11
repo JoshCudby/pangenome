@@ -102,3 +102,11 @@ def qubo_vars_to_path(qubo_vars: list[int], dg: nx.DiGraph) -> list:
     path = [_index_to_node_time(i, len(dg.nodes)) for i in on_vars]
     path = [(e[0], list(dg.nodes)[e[1]]) for e in path]
     return path
+
+
+def print_path(path: list):
+    """Pretty print a path"""
+    num_per_line = 8
+    for i in range(floor(len(path) / num_per_line)):
+        print(path[i * num_per_line: (i + 1) * num_per_line])
+    print(path[(i + 1)*num_per_line:-1])
