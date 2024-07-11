@@ -94,7 +94,7 @@ with gp.Env() as env, gp.Model(env=env) as model:
         os.mkdir(save_dir)
         
     now = datetime.now().strftime("%d%m%Y_%H%M")
-    save_file = save_dir + f"/qubo_gurobi_{now}"   
+    save_file = save_dir + f"/gurobi_{filename}_{now}"   
         
     to_save = np.array([model_vars.X, model.ObjVal + offset, path], dtype=object)
     np.save(save_file, to_save)

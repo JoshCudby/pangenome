@@ -19,7 +19,9 @@ def dwave_sample_bqm(sampler: Sampler, bqm: BQM, time_limit=None, num_reads=30, 
         (dict, float): Returns the best sample and best energy of the batch.
     """
     if isinstance(sampler, LeapHybridSampler):
-        print(f"Minimum time limit: {sampler.min_time_limit(bqm)}")
+        if time_limit == 0:
+            time_limit = sampler.min_time_limit(bqm)
+            print(f"Using default min time limit: {time_limit}")
         sampleset = sampler.sample(bqm, time_limit, label=label)
     elif isinstance(sampler, SimulatedAnnealingSampler):
         sampleset = sampler.sample(bqm, num_reads=num_reads)
@@ -115,4 +117,4 @@ def print_path(path: list):
     for i in range(floor(len(path) / num_per_line)):
         print(path[i * num_per_line: (i + 1) * num_per_line])
     if not (i + 1) * num_per_line == len(path) - 1:
-        print(path[(i + 1)*num_per_line:-1])
+        print(path[(i + 1)*num_per_line:])

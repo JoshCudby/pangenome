@@ -82,7 +82,7 @@ if not os.path.exists(save_dir):
     os.mkdir(save_dir)
     
 now = datetime.now().strftime("%d%m%Y_%H%M")
-save_file = save_dir + f"/qubo_mqlib_{now}"   
+save_file = save_dir + f"/mqlib_{filename}_{now}"   
     
 to_save = np.array([solution, energy, path], dtype=object)
 np.save(save_file, to_save)
