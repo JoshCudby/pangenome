@@ -43,11 +43,11 @@ if __name__ == "__main__":
         except KeyError:
             # Arbitrary weight assignment
             for node in graph.nodes:
-                if re.search("^c\d*$", node):
+                if re.search(r"^c\d*$", node):
                     graph.nodes[node]["weight"] = 1
                 elif re.search("^r", node):
                     graph.nodes[node]["weight"] = 2
-                elif re.search("^a1c\d*$", node):
+                elif re.search(r"^a1c\d*$", node):
                     graph.nodes[node]["weight"] = 1
                 elif re.search("^c6a1*$", node):
                     graph.nodes[node]["weight"] = 1
@@ -57,7 +57,7 @@ if __name__ == "__main__":
                     graph.nodes[node]["weight"] = 1
                 elif re.search("^cnvstr*$", node):
                     graph.nodes[node]["weight"] = 5
-                elif re.search("i\d", node):
+                elif re.search(r"i\d", node):
                     graph.nodes[node]["weight"] = 1 if uniform(0, 1) > 0.5 else 0
                 else:
                     graph.nodes[node]["weight"] = 0
