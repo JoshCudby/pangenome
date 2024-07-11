@@ -72,6 +72,7 @@ with gp.Env() as env, gp.Model(env=env) as model:
     model.Params.MIPFocus = 1
     model.Params.ImproveStartTime = 1200
     model.Params.TimeLimit = time_limit
+    model.Params.Seed = np.random.default_rng().integers(0, 1000)
     model.optimize()
     
     path = qubo_vars_to_path(model_vars.X, dg)

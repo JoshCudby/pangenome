@@ -7,7 +7,7 @@ from dimod import Sampler, BQM
 from dwave.system import LeapHybridSampler
 
 
-def dwave_sample_bqm(sampler: Sampler, bqm: BQM, num_reads=30, label="QUBO"):
+def dwave_sample_bqm(sampler: Sampler, bqm: BQM, time_limit=None, num_reads=30, label="QUBO"):
     """Perform a batch of annealing on a given Binary Quadratic Model.
 
     Args:
@@ -19,7 +19,8 @@ def dwave_sample_bqm(sampler: Sampler, bqm: BQM, num_reads=30, label="QUBO"):
         (dict, float): Returns the best sample and best energy of the batch.
     """
     if isinstance(sampler, LeapHybridSampler):
-        sampleset = sampler.sample(bqm, label=label)
+        print(f"Minimum time limit: {sampler.min_time_limit(bqm)}")
+        sampleset = sampler.sample(bqm, time_limit, label=label)
     elif isinstance(sampler, SimulatedAnnealingSampler):
         sampleset = sampler.sample(bqm, num_reads=num_reads)
     else:
@@ -113,4 +114,5 @@ def print_path(path: list):
     num_per_line = 8
     for i in range(floor(len(path) / num_per_line)):
         print(path[i * num_per_line: (i + 1) * num_per_line])
-    print(path[(i + 1)*num_per_line:-1])
+    if not (i + 1) * num_per_line == len(path) - 1:
+        print(path[(i + 1)*num_per_line:-1])

@@ -60,7 +60,7 @@ def get_max_path_problem_qubo_matrix(graph: nx.DiGraph, penalty: int) -> np.ndar
     return qubo_matrix
 
 
-def dwave_sample_max_path_problem(graph: nx.Graph, sampler=None, penalty=None):
+def dwave_sample_max_path_problem(graph: nx.Graph, sampler=None, time_limit=None, penalty=None):
     """Solves the max path problem on a node-weighted graph.
 
     Args:
@@ -84,7 +84,7 @@ def dwave_sample_max_path_problem(graph: nx.Graph, sampler=None, penalty=None):
     print(f'Number of edges: {len(dg.edges)}')
     print(f'Number of QUBO vars: {len(bqm.variables)}')
     
-    best_sample, best_energy = dwave_sample_bqm(sampler, bqm, label=f"Max Path QUBO W = {W}")
+    best_sample, best_energy = dwave_sample_bqm(sampler, bqm, time_limit, label=f"Max Path QUBO W = {W}")
     
     best_path = dwave_sample_to_path(best_sample, dg)
     return best_sample, best_energy, best_path

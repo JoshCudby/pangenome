@@ -2,25 +2,34 @@
 
 usage()
 {
-    echo "usage: solver_benchmark [[[-f file ] [-n normalisation]] | [-h]]"
+    echo "usage: solver_benchmark [[[-f file ] [-n normalisation] [-ct classical time limit] [-qt quantum time limit]] | [-h]]"
 }
+
+# Defaults
+memory=4000
+classical_time_limit=60
+quantum_time_limit=
+normalisation=1
 
 while [ "$1" != "" ]; do
     case $1 in
-        -f | --file )           shift
-                                filename="$1"
-                                ;;
-        -n | --normalisation )  shift
-                                normalisation="$1"
-                                ;;
-        -t | --time )           shift
-                                time_limit="$1"
-                                ;;
-        -h | --help )           usage
-                                exit
-                                ;;
-        * )                     usage
-                                exit 1
+        -f | --file )             shift
+                                  filename="$1"
+                                  ;;
+        -n | --normalisation )    shift
+                                  normalisation="$1"
+                                  ;;
+        -ct | --classical-time )  shift
+                                  classical_time_limit="$1"
+                                  ;;
+        -qt | --quantum-time )    shift
+                                  quantum_time_limit="$1"
+                                  ;;
+        -h | --help )             usage
+                                  exit
+                                  ;;
+        * )                       usage
+                                  exit 1
     esac
     shift
 done
@@ -38,6 +47,18 @@ case $normalisation in
     *      ) echo "Normalisation was not a number."; exit 1
 esac
 
+case $classical_time_limit in
+    [0-9]* ) echo "Classical time limit:" $classical_time_limit
+             ;;
+    *      ) echo "Classical time limit was not a number."; exit 1
+esac
+
+case $quantum_time_limit in
+    [0-9]* ) echo "Quantum time limit:" $quantum_time_limit
+             ;;
+    *      ) echo "Quantum time limit was not a number."; exit 1
+esac
+
 # Gurobi solver
 printf "\n\n"
 echo "Gurobi Solver"
@@ -51,6 +72,6 @@ python3 "./tangle/max_path_mqlib.py" $filename $normalisation $time_limit
 # D-Wave solver
 printf "\n\n"
 echo "D-Wave Solver"
-python3 "./tangle/max_path_dwave.py" $filename $normalisation q
+python3 "./tangle/max_path_dwave.py" $filename $normalisation $quantum_time_limit q
 
 exit 0

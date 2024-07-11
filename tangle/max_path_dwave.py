@@ -79,7 +79,16 @@ if __name__ == "__main__":
     graph = normalise_node_weights(graph, normalisation)
     print(list(zip(list(graph.nodes), [graph.nodes[node]["normalised_weight"] for node in graph.nodes])))
     
-    if len(sys.argv) > 3 and sys.argv[3] == 'q':
+    if len(sys.argv) > 3:
+        try:
+            time_limit = int(sys.argv[3])
+        except ValueError:
+            time_limit = None
+        else:
+            time_limit = None
+
+    
+    if len(sys.argv) > 4 and sys.argv[4] == 'q':
         solver = "quantum"
         sampler = LeapHybridSampler()
         print("Using Leap Hybrid Solver")
@@ -88,7 +97,7 @@ if __name__ == "__main__":
         sampler = SimulatedAnnealingSampler()
         print("Using Classical Solver")    
    
-    sample, energy, path = dwave_sample_max_path_problem(graph, sampler)
+    sample, energy, path = dwave_sample_max_path_problem(graph, sampler, time_limit)
 
     print(f"Best path:")
     print_path(path)
