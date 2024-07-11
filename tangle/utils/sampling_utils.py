@@ -7,14 +7,16 @@ from dimod import Sampler, BQM
 from dwave.system import LeapHybridSampler
 
 
-def dwave_sample_bqm(sampler: Sampler, bqm: BQM, time_limit=None, num_reads=30, label="QUBO"):
-    """Perform a batch of annealing on a given Binary Quadratic Model.
+def dwave_sample_bqm(sampler: Sampler, bqm: BQM, time_limit=None, label="QUBO", num_reads=30):
+    """Perform a batch of annealing with greedy post-processing on a given Binary Quadratic Model.
 
     Args:
         sampler (Sampler): The sampler to anneal with.
         bqm (BQM): The model to anneal.
-        num_reads (int, optional): Number of runs in batch. Defaults to 30.
-
+        time_limit (int, optional): The time limit. Quantum solver only.
+        label (str, optional): The label for sample submission on DWave platform. Quantum solver only.
+        num_reads (int, optional): Number of runs in batch. Defaults to 30. Classical Solver only.
+        
     Returns:
         (dict, float): Returns the best sample and best energy of the batch.
     """
