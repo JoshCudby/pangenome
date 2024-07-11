@@ -62,7 +62,9 @@ out = process.stdout.decode("utf-8")
 out_data = [x for x in out.split('\n') if len(x) > 0]
 solution = out_data[2].split()
 solution = [int(x) for x in solution]
-energy = int(out_data[0].split(',')[3])
+solution_energy = int(out_data[0].split(',')[3])
+offset = penalty * (W + 3)
+energy = offset - solution_energy
 
 path = qubo_vars_to_path(solution, dg)
 print(path)
@@ -80,5 +82,5 @@ if not os.path.exists(save_dir):
 now = datetime.now().strftime("%d%m%Y_%H%M")
 save_file = save_dir + f"/qubo_mqlib_{now}"   
     
-to_save = np.array([solution, offset - energy, path], dtype=object)
+to_save = np.array([solution, energy, path], dtype=object)
 np.save(save_file, to_save)
