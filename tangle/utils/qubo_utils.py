@@ -84,7 +84,7 @@ def dwave_sample_max_path_problem(graph: nx.Graph, sampler=None, time_limit=None
     print(f'Number of edges: {len(dg.edges)}')
     print(f'Number of QUBO vars: {len(bqm.variables)}')
     
-    best_sample, best_energy = dwave_sample_bqm(sampler, bqm, time_limit, label=f"Max Path QUBO W = {W}")
+    best_sample, best_energy = dwave_sample_bqm(sampler, bqm, time_limit=time_limit, label=f"Max Path QUBO W = {W}")
     
     best_path = dwave_sample_to_path(best_sample, dg)
     return best_sample, best_energy, best_path

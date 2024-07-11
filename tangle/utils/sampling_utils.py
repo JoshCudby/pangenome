@@ -19,7 +19,7 @@ def dwave_sample_bqm(sampler: Sampler, bqm: BQM, time_limit=None, num_reads=30, 
         (dict, float): Returns the best sample and best energy of the batch.
     """
     if isinstance(sampler, LeapHybridSampler):
-        if time_limit == 0:
+        if time_limit == -1:
             time_limit = sampler.min_time_limit(bqm)
             print(f"Using default min time limit: {time_limit}")
         sampleset = sampler.sample(bqm, time_limit, label=label)

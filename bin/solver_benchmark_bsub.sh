@@ -8,7 +8,7 @@ usage()
 # Defaults
 memory=4000
 classical_time_limit=60
-quantum_time_limit=0
+quantum_time_limit=-1
 normalisation=1
 
 while [ "$1" != "" ]; do
