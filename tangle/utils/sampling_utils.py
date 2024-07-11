@@ -1,6 +1,7 @@
 import numpy as np
 import networkx as nx
 from math import floor
+from greedy import SteepestDescentSolver
 from dimod.reference.samplers import SimulatedAnnealingSampler
 from dimod import Sampler, BQM
 from dwave.system import LeapHybridSampler
@@ -23,8 +24,11 @@ def dwave_sample_bqm(sampler: Sampler, bqm: BQM, num_reads=30, label="QUBO"):
         sampleset = sampler.sample(bqm, num_reads=num_reads)
     else:
         raise Exception("Unknown Sampler type")
-    best_sample = sampleset.first.sample
-    best_energy = sampleset.first.energy
+    greedy_solver = SteepestDescentSolver()
+    post_processed = greedy_solver.sample(bqm, initial_states=sampleset)
+    
+    best_sample = post_processed.first.sample
+    best_energy = post_processed.first.energy
     return best_sample, best_energy
 
 

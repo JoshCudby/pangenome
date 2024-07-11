@@ -89,6 +89,7 @@ if __name__ == "__main__":
         print("Using Classical Solver")    
    
     sample, energy, path = dwave_sample_max_path_problem(graph, sampler)
+
     print(f"Best path:")
     print_path(path)
     print(f"Energy of path: {energy}")
