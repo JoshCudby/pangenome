@@ -53,12 +53,6 @@ case $classical_time_limit in
     *      ) echo "Classical time limit was not a number."; exit 1
 esac
 
-case $quantum_time_limit in
-    [0-9]* ) echo "Quantum time limit:" $quantum_time_limit
-             ;;
-    *      ) echo "Quantum time limit was not a number."; exit 1
-esac
-
 # Gurobi solver
 printf "\n\n"
 echo "Gurobi Solver"
