@@ -2,7 +2,7 @@
 
 usage()
 {
-    echo "usage: solver_benchmark_bsub [[[-f file ] [-n normalisation] [-t time limit] [-m memory] [-j jobs]] | [-h]]"
+    echo "usage: batch_gurobi [[[-f file ] [-n normalisation] [-t time limit] [-m memory] [-j jobs]] | [-h]]"
 }
 
 # Defaults

@@ -2,12 +2,12 @@
 
 usage()
 {
-    echo "usage: batch_dwave [[[-f file ] [-n normalisation] [-qt quantum time limit] [-m memory] [-j jobs]] | [-h]]"
+    echo "usage: batch_mqlib [[[-f file ] [-n normalisation] [-t time limit] [-m memory] [-j jobs]] | [-h]]"
 }
 
 # Defaults
 memory=4000
-quantum_time_limit=-1
+time_limit=-1
 normalisation=1
 jobs=1
 
@@ -19,8 +19,8 @@ while [ "$1" != "" ]; do
         -n | --normalisation )    shift
                                   normalisation="$1"
                                   ;;
-        -qt | --quantum-time )    shift
-                                  quantum_time_limit="$1"
+        -t | --time )             shift
+                                  time_limit="$1"
                                   ;;
         -m | --memory )           shift
                                   memory="$1"
@@ -62,19 +62,19 @@ case $jobs in
     *      ) echo "Jobs was not a number."; exit 1
 esac
 
-case $quantum_time_limit in
-    -1     ) echo "Default quantum time limit"
+case $time_limit in
+    -1     ) echo "Default time limit"
              ;;
-    [0-9]* ) echo "Quantum time limit:" $quantum_time_limit
+    [0-9]* ) echo "Time limit:" $time_limit
              ;;
-    *      ) echo "Quantum time limit was not a number."; exit 1
+    *      ) echo "Time limit was not a number."; exit 1
 esac
 
 ## MAIN
 
-# D-Wave solver
+# MQLib solver
 printf "\n\n"
-echo "D-Wave Solver"
-bsub -J  "dwaveJobs[1-$jobs]" -R '"select[mem>'$memory'] rusage[mem='$memory']"' -M "$memory" -o "out/dwave.$filename.%J.%I" -e "out/error.dwave.$filename.%J" -G "qpg" "python3 ./tangle/max_path_dwave.py $filename $normalisation $quantum_time_limit q"
+echo "MQlib Solver"
+bsub -J  "mqlibJobs[1-$jobs]" -R '"select[mem>'$memory'] rusage[mem='$memory']"' -M "$memory" -o "out/mqlib.$filename.%J.%I" -e "out/error.mqlib.$filename.%J" -G "qpg" "python3 ./tangle/max_path_mqlib.py $filename $normalisation $time_limit"
 
 exit 0
