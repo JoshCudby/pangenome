@@ -2,13 +2,14 @@
 
 usage()
 {
-    echo "usage: solver_benchmark_bsub [[[-f file ] [-n normalisation] [-qt quantum time limit] [-m memory]] | [-h]]"
+    echo "usage: solver_benchmark_bsub [[[-f file ] [-n normalisation] [-qt quantum time limit] [-m memory] [-j jobs]] | [-h]]"
 }
 
 # Defaults
 memory=4000
 quantum_time_limit=-1
 normalisation=1
+jobs=1
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -23,6 +24,9 @@ while [ "$1" != "" ]; do
                                   ;;
         -m | --memory )           shift
                                   memory="$1"
+                                  ;;
+        -j | --jobs )             shift
+                                  jobs="$1"
                                   ;;
         -h | --help )             usage
                                   exit
@@ -52,6 +56,12 @@ case $memory in
     *      ) echo "Memory was not a number."; exit 1
 esac
 
+case $jobs in
+    [0-9]* ) echo "Jobs:" $jobs
+             ;;
+    *      ) echo "Jobs was not a number."; exit 1
+esac
+
 case $quantum_time_limit in
     -1     ) echo "Default quantum time limit"
              ;;
@@ -65,6 +75,6 @@ esac
 # D-Wave solver
 printf "\n\n"
 echo "D-Wave Solver"
-bsub -J  "dwaveJobs[1-10]" -R '"select[mem>'$memory'] rusage[mem='$memory']"' -M "$memory" -o "out/dwave.$filename.%J.%I" -e "out/error.dwave.$filename.%J" -G "qpg" "python3 ./tangle/max_path_dwave.py $filename $normalisation $quantum_time_limit q"
+bsub -J  "dwaveJobs[1-$jobs]" -R '"select[mem>'$memory'] rusage[mem='$memory']"' -M "$memory" -o "out/dwave.$filename.%J.%I" -e "out/error.dwave.$filename.%J" -G "qpg" "python3 ./tangle/max_path_dwave.py $filename $normalisation $quantum_time_limit q"
 
 exit 0
