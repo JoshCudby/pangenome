@@ -2,7 +2,7 @@
 
 usage()
 {
-    echo "usage: solver_benchmark_bsub [[[-f file ] [-n normalisation] [-qt quantum time limit] [-m memory] [-j jobs]] | [-h]]"
+    echo "usage: solver_benchmark_bsub [[[-f file ] [-n normalisation] [-t time limit] [-m memory] [-j jobs]] | [-h]]"
 }
 
 # Defaults
@@ -19,7 +19,7 @@ while [ "$1" != "" ]; do
         -n | --normalisation )    shift
                                   normalisation="$1"
                                   ;;
-        -qt | --quantum-time )    shift
+        -t | --time )             shift
                                   time_limit="$1"
                                   ;;
         -m | --memory )           shift
