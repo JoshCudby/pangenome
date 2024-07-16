@@ -28,9 +28,10 @@ done
 ## MAIN
 
 out_dir="./out"
-file_pattern="gurobi.*.$kmer.*"
+file_pattern="gurobi.*.$kmer.*.\\d"
 search_pattern="Best path"
 stop_pattern="Energy of path"
+max_lines=30
 
 echo "Searching in dir: $out_dir"
 # Find all files matching the file_pattern in the specified directory
@@ -44,6 +45,7 @@ for file in $files; do
         # Check if the line matches the search pattern
         if echo "$line" | grep -q "$search_pattern"; then
             echo "$line"
+            count=1
             # Continue reading lines until one matches the stop pattern
             while IFS= read -r next_line; do
                 if echo "$next_line" | grep -q "$stop_pattern"; then
@@ -51,6 +53,10 @@ for file in $files; do
                     break
                 fi
                 echo "$next_line"
+                ((count++))
+                if [ "$count" -ge "$max_lines" ]; then
+                    break
+                fi
             done
         fi
     done < "$file"
