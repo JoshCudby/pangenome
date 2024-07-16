@@ -29,6 +29,7 @@ def dwave_sample_bqm(sampler: Sampler, bqm: BQM, time_limit=None, label="QUBO", 
         sampleset = sampler.sample(bqm, num_reads=num_reads)
     else:
         raise Exception("Unknown Sampler type")
+    print(sampleset.info["timing"]['qpu_access_time'])
     greedy_solver = SteepestDescentSolver()
     post_processed = greedy_solver.sample(bqm, initial_states=sampleset)
     
