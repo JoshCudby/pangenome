@@ -28,7 +28,7 @@ done
 ## MAIN
 
 out_dir="./out"
-file_pattern="gurobi.*.$kmer.*.\d"
+file_pattern="gurobi.*.$kmer.*"
 search_pattern="Best path"
 stop_pattern="Energy of path"
 max_lines=30
