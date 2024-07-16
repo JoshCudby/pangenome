@@ -78,11 +78,12 @@ with gp.Env() as env, gp.Model(env=env) as model:
     path = qubo_vars_to_path(model_vars.X, dg)
     print(f"Best path:")
     print_path(path)
+    validate_path(path, graph)
     print(f"Energy of path: {model.ObjVal + offset}")
+    
     print('Objective value: %g' % model.ObjVal)
     print(f'Offset: {offset}')
     print(f'Best possible score: {-W - offset + 1}')
-    validate_path(path, graph)
     
     save_dir = "out"
     if not os.path.exists(save_dir):

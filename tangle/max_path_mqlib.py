@@ -71,8 +71,8 @@ energy = offset - solution_energy
 path = qubo_vars_to_path(solution, dg)
 print(f"Best path:")
 print_path(path)
-print(f"Energy of path: {energy}")
 validate_path(path, graph)
+print(f"Energy of path: {energy}")
 
 save_dir = "out"
 if not os.path.exists(save_dir):

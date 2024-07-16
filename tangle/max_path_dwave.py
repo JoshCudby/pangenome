@@ -100,8 +100,8 @@ sample, energy, path = dwave_sample_max_path_problem(graph, sampler, time_limit=
 
 print(f"Best path:")
 print_path(path)
-print(f"Energy of path: {energy}")
 validate_path(path, graph)
+print(f"Energy of path: {energy}")
 
 save_dir = "out"
 if not os.path.exists(save_dir):
