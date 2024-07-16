@@ -29,6 +29,7 @@ file_pattern="$solver.*.$kmer.*"
 search_pattern="Best path"
 stop_pattern="Energy of path"
 max_lines=30
+run_time_pattern="Run time"
 
 echo "Searching in dir: $out_dir"
 # Find all files matching the file_pattern in the specified directory
@@ -55,6 +56,10 @@ for file in $files; do
                     break
                 fi
             done
+        fi
+
+        if echo "$line" | grep -q "$run_time_pattern"; then
+            echo "$line"
         fi
     done < "$file"
 done
