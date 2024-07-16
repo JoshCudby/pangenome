@@ -2,19 +2,16 @@
 
 usage()
 {
-    echo "usage: compile_gurobi_data [[-k kmer]] | [-h]]"
+    echo "usage: compile_data [[-s solver] [-k kmer]] | [-h]]"
 }
-
-get_path()
-{
-    awk -f bin/get_path.awk {}
-}
-
 
 while [ "$1" != "" ]; do
     case $1 in
         -k | --kmer )   shift
                         kmer="$1"
+                        ;;
+        -s | --solver ) shift
+                        solver="$1"
                         ;;
         -h | --help )   usage
                         exit
@@ -28,7 +25,7 @@ done
 ## MAIN
 
 out_dir="./out"
-file_pattern="gurobi.*.$kmer.*"
+file_pattern="$solver.*.$kmer.*"
 search_pattern="Best path"
 stop_pattern="Energy of path"
 max_lines=30
