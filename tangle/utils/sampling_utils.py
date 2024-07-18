@@ -166,10 +166,10 @@ def validate_path(path: list, graph: nx.Graph):
     time_offset = 0
     for i in range(len(path)):
         if i < path[i][0] + time_offset:
-            print('Skipped time {i}')
+            print(f'Skipped time {i}')
             time_offset -= 1
         elif i > path[i][0] + time_offset:
-            print('Visited 2 nodes at time {i}')
+            print(f'Visited 2 nodes at time {i}')
             
     for node in graph.nodes:
         try:
