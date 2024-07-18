@@ -5,3 +5,6 @@
 	path = MQLib
 	url = https://github.com/JoshCudby/MQLib.git
 	branch = master
+[submodule "qpg"]
+	path = qpg
+	url = https://github.com/jkbonfield/qpg/
