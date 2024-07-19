@@ -28,7 +28,7 @@ out_dir="./out"
 file_pattern="$solver.*.$kmer.*"
 search_pattern="Best path"
 stop_pattern="Energy of path"
-max_lines=30
+max_lines=100
 run_time_pattern="Run time"
 qpu_time_pattern="qpu_access_time"
 

@@ -31,7 +31,7 @@ def dwave_sample_bqm(sampler: Sampler, bqm: BQM, time_limit=None, label="QUBO", 
         raise Exception("Unknown Sampler type")
     
     try:
-        print(sampleset.info['timing'])
+        print(f"D-Wave access time: {round(sampleset.info['run_time'] / 10 ** 6)}")
     except:
         pass
     
