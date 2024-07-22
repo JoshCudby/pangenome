@@ -31,11 +31,11 @@ stop_pattern="Energy of path"
 max_lines=100
 run_time_pattern="Run time"
 qpu_time_pattern="qpu_access_time"
-compiled_pattern="compiled"
+compiled_pattern="*compiled*"
 
 echo "Searching in dir: $out_dir"
 # Find all files matching the file_pattern in the specified directory
-files=$(find "$out_dir" -type f \( -name "$file_pattern" -a \! -name "$compiled_pattern" \))
+files=$(find "$out_dir" -type f \( -name "$file_pattern" -a -not -name "$compiled_pattern" \))
 
 # Iterate through each file and search for the pattern
 for file in $files; do
