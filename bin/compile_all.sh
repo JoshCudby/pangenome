@@ -19,7 +19,8 @@ while [ "$1" != "" ]; do
     shift
 done
 
-for solver in dwave gurobi mqlib
+solvers=("dwave" "gurobi" "mqlib")
+for solver in "${solvers[@]}"
 do
     bin/compile_data.sh -s $solver -k $kmer > "out/$solver.compiled.$kmer.txt"
 done
