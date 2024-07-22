@@ -35,7 +35,7 @@ compiled_pattern="compiled"
 
 echo "Searching in dir: $out_dir"
 # Find all files matching the file_pattern in the specified directory
-files=$(find "$out_dir" -type f \( -name "$file_pattern" -a -name " -not $compiled_pattern" \))
+files=$(find "$out_dir" -type f \( -name "$file_pattern" -a \! -name "$compiled_pattern" \))
 
 # Iterate through each file and search for the pattern
 for file in $files; do
