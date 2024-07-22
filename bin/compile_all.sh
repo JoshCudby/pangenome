@@ -21,5 +21,5 @@ done
 
 for solver in dwave gurobi mqlib
 do
-    bin/compile_data.sh -s $solver -k $kmer
+    bin/compile_data.sh -s $solver -k $kmer > "out/$solver.compiled.$kmer.txt"
 done
