@@ -25,7 +25,7 @@ done
 ## MAIN
 
 out_dir="./out"
-file_pattern="$solver.*.$kmer.*"
+file_pattern="$solver*$kmer*"
 search_pattern="Best path"
 stop_pattern="Energy of path"
 max_lines=100
