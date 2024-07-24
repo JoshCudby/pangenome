@@ -1,5 +1,6 @@
 import numpy as np
 import networkx as nx
+import re
 from math import floor
 from greedy import SteepestDescentSolver
 from dimod.reference.samplers import SimulatedAnnealingSampler
@@ -128,6 +129,16 @@ def print_path(path: list):
         print(path[(i + 1)*num_per_line:])
         
         
+def get_original_vertex_name(vertex_name):
+    pattern = r'(.*)_\d*'
+    match = re.search(pattern, vertex_name)
+    if match is None:
+        raise Exception('Could not retrieve vertex name')
+    else:
+        return match.group(1)
+
+        
+        
 def validate_path(path: list, graph: nx.Graph):
     """Checks the constraints for a path on a graph.
     
@@ -144,19 +155,19 @@ def validate_path(path: list, graph: nx.Graph):
     node_dict['end'] = 0
     
     for i in range(len(path) - 1):
-        v1 = path[i][1][0:-2]
+        v1 = get_original_vertex_name(path[i][1])
         node_dict[v1] += 1
-        v2 = path[i + 1][1][0:-2]
-        if not (v1, v2) in graph.edges:
-            if v1 =='end' and v2 == 'end':
+        v2 = get_original_vertex_name(path[i + 1][1])
+        if v2 == 'end':
+            if v1 == 'end':
                 pass
             else:
-                try:
-                    start_value = graph.nodes[v1]["start"]
-                    if not start_value == 'end' and v2 == 'end':
-                        print(f'Broke graph edge at step {i}')
-                except KeyError:
+                start_value = graph.nodes[v1]["start"]
+                if not start_value == "end":
                     print(f'Broke graph edge at step {i}')
+        else:
+            if not (v1, v2) in graph.edges:
+                print(f'Broke graph edge at step {i}')
     
     for node in graph.nodes:
         missing_visits = graph.nodes[node]["normalised_weight"] - node_dict[node]
@@ -170,16 +181,13 @@ def validate_path(path: list, graph: nx.Graph):
             time_offset -= 1
         elif i > path[i][0] + time_offset:
             print(f'Visited 2 nodes at time {i}')
+            time_offset += 1
             
-    for node in graph.nodes:
-        try:
-            if graph.nodes[node]["start"] == "start":
-                if not path[0][1][0:-2] == node:
-                    print(f'Did not start at Start node: {node}')
-        except:
-            pass
+    start_vertex = get_original_vertex_name(path[0][1])
+    if not graph.nodes[start_vertex]["start"] == "start":
+        print(f'Did not start at Start node; started at {start_vertex}')
     
-    if not path[-1][1] == 'end_0':
+    if not get_original_vertex_name(path[-1][1]) == 'end':
         print('Did not end at End node.')
             
     
