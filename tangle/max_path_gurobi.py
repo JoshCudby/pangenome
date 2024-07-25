@@ -75,11 +75,12 @@ with gp.Env() as env, gp.Model(env=env) as model:
     model.Params.Seed = np.random.default_rng().integers(0, 1000)
     model.optimize()
     
+    energy = model.ObjVal + offset
     path = qubo_vars_to_path(model_vars.X, dg)
     print(f"Best path:")
     print_path(path)
     validate_path(path, graph)
-    print(f"Energy of path: {model.ObjVal + offset}")
+    print(f"Energy of path: {energy}")
     
     print('Objective value: %g' % model.ObjVal)
     print(f'Offset: {offset}')
@@ -92,5 +93,7 @@ with gp.Env() as env, gp.Model(env=env) as model:
     now = datetime.now().strftime("%d%m%Y_%H%M")
     save_file = save_dir + f"/gurobi_{filename}_{now}"   
         
-    to_save = np.array([model_vars.X, model.ObjVal + offset, path], dtype=object)
+    to_save = np.array([model_vars.X, energy, path], dtype=object)
     np.save(save_file, to_save)
+    print('Compilation Data')
+    print(f'[{time_limit}, {energy}]')

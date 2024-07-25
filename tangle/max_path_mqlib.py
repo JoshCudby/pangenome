@@ -83,3 +83,5 @@ save_file = save_dir + f"/mqlib_{filename}_{now}"
     
 to_save = np.array([solution, energy, path], dtype=object)
 np.save(save_file, to_save)
+print('Compilation Data')
+print(f'[{time_limit}, {energy}]')

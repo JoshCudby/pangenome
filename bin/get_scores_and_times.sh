@@ -23,7 +23,8 @@ while [ "$1" != "" ]; do
 done
 
 search_pattern="Energy of path"
-stop_pattern="Run time"
+run_time_pattern="Run time"
+quantum_time_pattern="qpu_access_time"
 
 file="out/$solver.compiled.$kmer.txt"
 # Read the file line by line
@@ -34,7 +35,7 @@ while IFS= read -r line; do
         count=1
         # Continue reading lines until one matches the stop pattern
         while IFS= read -r next_line; do
-            if echo "$next_line" | grep -q "$stop_pattern"; then
+            if echo "$next_line" | grep -q "$run_time_pattern \| $quantum_time_pattern"; then
                 echo "$next_line"
                 break
             fi

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+usage()
+{
+    echo "usage: compile_full_benchmark [[-s solver] [-f filename]] | [-h]]"
+}
+
+while [ "$1" != "" ]; do
+    case $1 in
+        -f | --kmer )   shift
+                        filename="$1"
+                        ;;
+        -s | --solver ) shift
+                        solver="$1"
+                        ;;
+        -h | --help )   usage
+                        exit
+                        ;;
+        * )             usage
+                        exit 1
+    esac
+    shift
+done
+
+out_dir="./out"
+file_pattern="$solver.full.$filename*"
+search_pattern="Compilation data"
+
+files=$(find "$out_dir" -type f -name "$file_pattern" )
+
+# Iterate through each file and search for the pattern
+for file in $files; do
+    # Read the file line by line
+    while IFS= read -r line; do
+        # Check if the line matches the search pattern
+        if echo "$line" | grep -q "$search_pattern"; then
+            IFS= read -r next_line;
+            echo "$next_line"
+        fi
+    done < "$file"
+done
