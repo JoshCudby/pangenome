@@ -57,7 +57,7 @@ case $jobs in
 esac
 
 ## MAIN
-for time in "${times_arr[@]}"
+for time_limit in "${times_arr[@]}"
 do
     bsub -J  "mqlibJobs[1-$jobs]" -R '"select[mem>'$memory'] rusage[mem='$memory']"' -M "$memory" -o "out/mqlib.full.$filename.%J.%I" -e "out/error.mqlib.full.$filename.%J" -G "qpg" "python3 ./tangle/max_path_mqlib.py $filename $normalisation $time_limit"
 done
