@@ -7,7 +7,7 @@ usage()
 
 while [ "$1" != "" ]; do
     case $1 in
-        -f | --kmer )   shift
+        -f | --file )   shift
                         filename="$1"
                         ;;
         -s | --solver ) shift
@@ -24,7 +24,7 @@ done
 
 out_dir="./out"
 file_pattern="$solver.full.$filename*"
-search_pattern="Compilation data"
+search_pattern="Compilation Data"
 
 files=$(find "$out_dir" -type f -name "$file_pattern" )
 
