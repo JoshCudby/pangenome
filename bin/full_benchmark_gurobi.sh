@@ -59,7 +59,7 @@ esac
 ## MAIN
 for time_limit in "${times_arr[@]}"; do
     for (( COUNTER=1; COUNTER<=$jobs; COUNTER+=2 )); do
-        bsub -J  "mqlibJobs[1-2]" -R '"select[mem>'$memory'] rusage[mem='$memory']"' -M "$memory" -o "out/gurobi.full.$filename.%J.%I" -e "out/error.gurobi.full.$filename.%J" -G "qpg" "python3 ./tangle/max_path_gurobi.py $filename $normalisation $time_limit"
+        bsub -J  "gurobiJobs[1-2]" -R '"select[mem>'$memory'] rusage[mem='$memory']"' -M "$memory" -o "out/gurobi.full.$filename.%J.%I" -e "out/error.gurobi.full.$filename.%J" -G "qpg" "python3 ./tangle/max_path_gurobi.py $filename $normalisation $time_limit"
         sleep $time_limit
     done
 done

@@ -96,4 +96,4 @@ with gp.Env() as env, gp.Model(env=env) as model:
     to_save = np.array([model_vars.X, energy, path], dtype=object)
     np.save(save_file, to_save)
     print('Compilation Data')
-    print(f'[{time_limit}, {energy}]')
+    print(f'[{time_limit}, {energy}],')
