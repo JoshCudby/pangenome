@@ -4,6 +4,7 @@ import re
 from math import floor
 from greedy import SteepestDescentSolver
 from dimod import Sampler, BQM
+from dwave.system import LeapHybridSampler
 
 
 def dwave_sample_bqm(sampler: Sampler, bqm: BQM, time_limit=None, label="QUBO", num_reads=30):
@@ -20,10 +21,13 @@ def dwave_sample_bqm(sampler: Sampler, bqm: BQM, time_limit=None, label="QUBO", 
         (dict, float): Returns the best sample and best energy of the batch.
     """
     
-    if time_limit == -1:
-        time_limit = sampler.min_time_limit(bqm)
-        print(f"Using default min time limit: {time_limit}")
-    sampleset = sampler.sample(bqm, time_limit, label=label)
+    if isinstance(sampler, LeapHybridSampler):
+        if time_limit == -1:
+            time_limit = sampler.min_time_limit(bqm)
+            print(f"Using default min time limit: {time_limit}")
+        sampleset = sampler.sample(bqm, time_limit, label=label)
+    else:
+        sampleset = sampler.sample(bqm, label=label, num_reads=num_reads)
     
     try:
         print(f"D-Wave access time: {round(sampleset.info['run_time'] / 10 ** 6)}")

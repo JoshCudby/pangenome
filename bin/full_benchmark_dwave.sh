@@ -2,7 +2,7 @@
 
 usage()
 {
-    echo "usage: full_benchmark_gurobi [[[-f file] [-j jobs] [-t times] [-n normalisation] [-m memory]] | [-h]]"
+    echo "usage: full_benchmark_dwave [[[-f file] [-j jobs] [-t times] [-n normalisation] [-m memory]] | [-h]]"
 }
 
 while [ "$1" != "" ]; do
@@ -57,9 +57,8 @@ case $jobs in
 esac
 
 ## MAIN
-for time_limit in "${times_arr[@]}"; do
-    for (( COUNTER=1; COUNTER<=$jobs; COUNTER+=2 )); do
-        bsub -J  "gurobiJobs[1-2]" -R '"select[mem>'$memory'] rusage[mem='$memory']"' -M "$memory" -o "out/gurobi.full.$filename.%J.%I" -e "out/error.gurobi.full.$filename.%J" -G "qpg" "python3 ./tangle/max_path_gurobi.py $filename $normalisation $time_limit"
-        sleep $time_limit
-    done
+for time_limit in "${times_arr[@]}"
+do
+    echo Submitting batch with time limit: $time_limit
+    bsub -J  "dwaveJobs[1-$jobs]" -R '"select[mem>'$memory'] rusage[mem='$memory']"' -M "$memory" -o "out/dwave.full.$filename.%J.%I" -e "out/error.dwave.full.$filename.%J" -G "qpg" "python3 ./tangle/max_path_dwave.py $filename $normalisation $time_limit q"
 done

@@ -2,7 +2,7 @@
 
 usage()
 {
-    echo "usage: full_benchmark_mqlib [[-f file] [-j jobs] [-t times]] | [-h]]"
+    echo "usage: full_benchmark_mqlib [[[-f file] [-j jobs] [-t times] [-n normalisation] [-m memory]] | [-h]]"
 }
 
 while [ "$1" != "" ]; do

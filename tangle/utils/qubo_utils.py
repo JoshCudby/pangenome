@@ -67,6 +67,7 @@ def dwave_sample_max_path_problem(graph: nx.Graph, sampler=None, time_limit=None
     Args:
         graph (nx.Graph): The underlying graph.
         sampler (Sampler, optional): The sampler to use. Defaults to SimulatedAnnealingSampler.
+        time_limit (int, optional): The time limit passed to the sampler.
         penalty (int, optional): The penalty for breaking constraints. Defaults to total weight of graph.
     """
     if sampler is None:
