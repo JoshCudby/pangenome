@@ -1,9 +1,7 @@
 import sys
-import re
 import os
 import numpy as np
 from datetime import datetime
-from random import uniform
 from dwave.system import LeapHybridSampler
 from dimod.reference import SimulatedAnnealingSampler
 from utils.qubo_utils import dwave_sample_max_path_problem

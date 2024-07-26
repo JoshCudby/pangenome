@@ -1,7 +1,6 @@
 import numpy as np
 import sys
 import subprocess
-import re
 import os
 from datetime import datetime
 from utils.sampling_utils import qubo_vars_to_path

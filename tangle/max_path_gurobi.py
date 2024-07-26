@@ -2,10 +2,8 @@ import gurobipy as gp
 from gurobipy import GRB
 import numpy as np
 import sys
-import re
 import os
 from datetime import datetime
-from random import uniform
 from utils.qubo_utils import graph_to_max_path_digraph, get_max_path_problem_qubo_matrix
 from utils.graph_utils import graph_from_gfa_file, toy_graph, normalise_node_weights
 from utils.sampling_utils import qubo_vars_to_path
