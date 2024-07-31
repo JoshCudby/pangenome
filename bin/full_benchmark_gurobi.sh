@@ -59,5 +59,5 @@ esac
 ## MAIN
 for time_limit in "${times_arr[@]}"; do
     echo Submitting batch with time limit: $time_limit
-    bsub -J  "gurobiJobs[1-$jobs]" -R '"select[mem>'$memory'] rusage[mem='$memory']"' -M "$memory" -o "out/gurobi.full.$filename.%J.%I" -e "out/error.gurobi.full.$filename.%J" -G "qpg" "python3 ./tangle/max_path_gurobi.py $filename $normalisation $time_limit"
+    bsub -m "node-5-10-4" -J  "gurobiJobs[1-$jobs]" -R '"select[mem>'$memory'] rusage[mem='$memory']"' -M "$memory" -o "out/gurobi.full.$filename.%J.%I" -e "out/error.gurobi.full.$filename.%J" -G "qpg" "python3 ./tangle/max_path_gurobi.py $filename $normalisation $time_limit"
 done
