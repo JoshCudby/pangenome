@@ -50,8 +50,6 @@ with gp.Env() as env, gp.Model(env=env) as model:
     model_vars = model.addMVar(shape=qubo_matrix.shape[0], vtype=GRB.BINARY, name="x")
     model.setObjective(model_vars @ qubo_matrix @ model_vars, GRB.MINIMIZE)
     model.Params.BestObjStop = -W - offset + 1
-    model.Params.MIPFocus = 1
-    model.Params.ImproveStartTime = 1200
     model.Params.TimeLimit = time_limit
     model.Params.Seed = np.random.default_rng().integers(0, 1000)
     model.optimize()

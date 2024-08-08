@@ -1,0 +1,7 @@
+H	VN:Z:1.0
+S	u0	AAAA
+S	u1	CCCC
+S	u2	GGGG
+L	u0	-	u1	-	0M
+L	u1	-	u2	-	0M
+L	u2	-	u0	-	0M  
