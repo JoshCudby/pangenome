@@ -4,8 +4,6 @@ import re
 import gurobipy as gp
 from gurobipy import GRB
 from math import floor
-from dimod import BQM
-from dwave.system import LeapHybridSampler
 
 
 def dwave_sample_qubo(qubo_matrix: np.ndarray, offset: float, time_limit=None, label="Oriented QUBO") -> tuple[dict, float]:
@@ -20,6 +18,9 @@ def dwave_sample_qubo(qubo_matrix: np.ndarray, offset: float, time_limit=None, l
     Returns:
         (dict, float): Returns the best sample and best energy of the batch.
     """
+    
+    from dimod import BQM
+    from dwave.system import LeapHybridSampler
     bqm = BQM(qubo_matrix, 'BINARY')
     bqm.offset = offset
     sampler = LeapHybridSampler()
