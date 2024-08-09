@@ -3,10 +3,9 @@ import sys
 import subprocess
 import os
 from datetime import datetime
-from utils.sampling_utils import sample_list_to_path
 from utils.graph_utils import oriented_graph_from_file, normalise_node_weights
 from utils.qubo_utils import qubo_matrix_from_graph
-from utils.sampling_utils import print_path, validate_path
+from utils.sampling_utils import validate_path, sample_list_to_path
 
 
 if len(sys.argv) > 1:
@@ -65,7 +64,7 @@ path = sample_list_to_path(solution, graph, T_max, V)
 validate_path(path, graph)
 print(f"Energy of path: {energy}")
 
-save_dir = "out"
+save_dir = "out/oriented"
 if not os.path.exists(save_dir):
     os.mkdir(save_dir)
     

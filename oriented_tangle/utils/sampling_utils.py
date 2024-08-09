@@ -1,6 +1,8 @@
 import numpy as np
 import networkx as nx
 import re
+import gurobipy as gp
+from gurobipy import GRB
 from math import floor
 from dimod import BQM
 from dwave.system import LeapHybridSampler
@@ -36,6 +38,27 @@ def dwave_sample_qubo(qubo_matrix: np.ndarray, offset: float, time_limit=None, l
     return best_sample, best_energy
 
 
+def gurobi_sample_qubo(qubo_matrix: np.ndarray, graph: nx.Graph, offset: int, T_max: int, time_limit: int):
+    total_weight = int(sum(graph.nodes[node]["weight"] for node in list(graph.nodes)) / 2)
+    lambda_g = T_max
+    best_obj = T_max * (1 - lambda_g) - total_weight + lambda_g
+    
+    print(f'Offset: {offset}')
+    print(f'Total weight: {total_weight}')
+    print(f'T_max: {T_max}')
+    print(f'Best obj: {best_obj}')    
+
+    with gp.Env() as env, gp.Model(env=env) as model:
+        model_vars = model.addMVar(shape=qubo_matrix.shape[0], vtype=GRB.BINARY, name="x")
+        model.setObjective(model_vars @ qubo_matrix @ model_vars, GRB.MINIMIZE)
+        model.Params.BestObjStop = best_obj - offset
+        model.Params.TimeLimit = time_limit
+        model.Params.Seed = np.random.default_rng().integers(0, 1000)
+        model.optimize()
+        energy = model.ObjVal + offset
+        return model_vars.X, energy
+
+
 def sample_array_to_path(sample_array: np.ndarray, nodes: list, V: int):
     nz = np.nonzero(sample_array == 1)
     return [
@@ -44,14 +67,6 @@ def sample_array_to_path(sample_array: np.ndarray, nodes: list, V: int):
             nodes[nz[1][i] * 2 + nz[2][i]] if nz[1][i] in range(V) else 'end'
         ) for i in range(nz[0].shape[0])
     ]
-
-
-def dwave_sample_to_path(graph: nx.Graph, sample: dict, T_max: int, V: int):
-    sample_list = np.array(list(sample.values()))
-    for idx in [t * (V + 1) * 2 + V * 2 + 1 for t in range(T_max)]:
-        sample_list = np.insert(sample_list, idx, 0)
-    sample_array = sample_list.reshape((T_max, V + 1, 2))
-    return sample_array_to_path(sample_array, list(graph.nodes), V)
 
 
 def sample_list_to_path(sample_list: np.ndarray, graph: nx.Graph, T_max: int, V: int):

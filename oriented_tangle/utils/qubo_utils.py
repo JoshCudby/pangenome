@@ -1,13 +1,15 @@
 import numpy as np
 import networkx as nx
 from itertools import product
+from math import floor
 
 
-def qubo_matrix_from_graph(graph: nx.DiGraph) -> tuple[np.ndarray, float, int, int]:
+def qubo_matrix_from_graph(graph: nx.DiGraph, alpha: float | None=None) -> tuple[np.ndarray, float, int, int]:
     """Constructs the QUBO matrix corresponding to a graph. Also returns the offset of the model, the max time and the number of nodes.
 
     Args:
         graph (nx.DiGraph): the node-weighted graph describing the problem.
+        alpha (float, optional): the proportion of extra time allowed to paths over the maximum weight.
 
     Returns:
         tuple[np.ndarray, float, int, int]: qubo_matrix, offset, T_max, V
@@ -17,8 +19,9 @@ def qubo_matrix_from_graph(graph: nx.DiGraph) -> tuple[np.ndarray, float, int, i
     total_weight = int(sum(graph.nodes[node]["weight"] for node in nodes) / 2)
     
     # T_max = total weight + "a bit"
-    alpha = 1.2
-    T_max = int(total_weight * alpha)
+    if alpha is None:
+        alpha = 1.2
+    T_max = floor(total_weight * alpha)
 
     # Penalty Values
     lambda_t = 10 * T_max ** 2

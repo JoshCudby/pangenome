@@ -2,13 +2,16 @@
 
 usage()
 {
-    echo "usage: compile_full_benchmark [[-s solver] [-f filename]] | [-h]]"
+    echo "usage: compile_full_benchmark [[-s solver] [-f filename] [-d directory]] | [-h]]"
 }
 
 while [ "$1" != "" ]; do
     case $1 in
         -f | --file )   shift
                         filename="$1"
+                        ;;
+        -d | --dir )    shift
+                        dir="$1"
                         ;;
         -s | --solver ) shift
                         solver="$1"
@@ -22,7 +25,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-out_dir="./out"
+out_dir="./out/$dir"
 file_pattern="$solver.full.$filename*"
 search_pattern="Compilation Data"
 
